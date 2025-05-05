@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.8" type="plugin" group="system" method="upgrade">
+    <name>ET Tennis</name>
+    <description>ET Tennis Joomla! template - &lt;a target='_blank' href='https://doc.enginetemplates.com/free-joomla4-template-document/'&gt;See Template Document&lt;/a&gt; | &lt;a target='_blank' href='https://enginetemplates.com/themes/et-tennis-free-responsive-tennis-website-template/'&gt;Get PRO license&lt;/a&gt; to access &lt;a target='_blank' href='https://j4demo.enginetemplates.com/joomla/premium/et-tennis'&gt;Full version as LIVE DEMO&lt;/a&gt; | We recommend the 3CX extension as a free Live Chat tool for Joomla! website. You can Register 3CX Start Up Free and see how to configure 3CX from your Joomla! admin panel. | &lt;a target='_blank' href='https://extensions.joomla.org/extension/3cx-live-chat/'&gt;3CX extension&lt;/a&gt; | &lt;a target='_blank' href='https://www.3cx.com/startup/'&gt;Register 3CX Start Up Free&lt;/a&gt; | &lt;a target='_blank' href='https://www.3cx.com/docs/joomla-live-chat/'&gt;How to configure 3CX&lt;/a&gt;</description>
+    <scriptfile>installer.script.php</scriptfile>
+    <files>
+		<filename plugin="tmp_helixult">installer.script.php</filename>
+    </files>
+    <plugins>
+        <plugin plugin="helixultimate" group="system" />
+    </plugins>
+    <template name="et_tennis"/>
+</extension>

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le Tournoi{% endblock %}
+
+{% block page_title %}Modifier le Tournoi{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Modifier le tournoi</h5>
+            </div>
+            <div class="card-body">
+                {{ include('tournoi/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Emprunt Calendar{% endblock %}
+
+{% block body %}
+  <h1>Emprunt Calendar</h1>
+  
+  <!-- FullCalendar container -->
+  <div data-controller="calendar" data-calendar-target="calendar"></div>
+{% endblock %}
+
+{% block javascripts %}
+  <!-- FullCalendar and Stimulus should be bundled via Webpack Encore -->
+  {{ asset('build/app.js') }}
+{% endblock %}

@@ -1,0 +1,482 @@
+/*** General CSS ***/
+body {
+    line-height: 1.9em;
+}
+
+/*** Header Area ***/
+/* Header Top */
+#sp-top-bar {
+    position: relative;
+    z-index: 9999;
+}
+
+/* Header Menu */
+#sp-header {
+    top: 10px;
+    height: inherit;
+    box-shadow: 0 0 4px 0 rgb(0 0 0 / 10%);
+    padding: 0;
+    -webkit-transition: all 0.4s ease-in-out;
+    transition: all 0.4s ease-in-out;
+   	width: 100%;
+  	max-width: 99%;
+    margin: 0 auto;
+    z-index: 9999;
+    position: relative;
+}
+#sp-header.header-sticky {
+    position: fixed;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.10);
+    top: 0;
+  	max-width: 100%;
+    margin: 0 auto;
+}
+body:not(.home) #sp-header {
+  	max-width: 100%;
+    margin: 0 auto;
+  	top: 0;
+    box-shadow: 0 0 4px 0 rgb(0 0 0 / 10%);
+}
+.sp-megamenu-parent .sp-dropdown li.sp-menu-item>a {
+  	font-size: 14px !important;
+    font-weight: 400 !important;
+    padding: 10px 0;
+}
+.sp-megamenu-parent > li > a, .sp-megamenu-parent > li > span {
+    text-transform: uppercase;
+    position: relative;
+}
+.sp-megamenu-parent > li > span {
+    color: #fff;
+}
+.sp-megamenu-parent>li.active>a {
+    font-weight: 600;
+}
+.sp-megamenu-parent > li {
+    position: relative;
+}
+#sp-menu ul.social-icons a {
+    font-size: 20px;
+}
+
+/* Canvas Menu */
+.offcanvas-menu .offcanvas-inner .menu-child > li a {
+    padding: 12px 10px !important;
+    border-bottom: 1px solid rgba(197, 153, 153, 0.21);
+    display: inherit;
+}
+.offcanvas-menu .offcanvas-inner ul.menu>li>a, .offcanvas-menu .offcanvas-inner ul.menu>li>span {
+    font-size: 15px;
+    font-weight: 500;
+}
+.burger-icon>span {
+    background-color: #fff;
+}
+.offcanvas-menu > .align-items-center {
+    background: #000;
+}
+.offcanvas-active .burger-icon>span, #modal-menu-toggler.active .burger-icon>span {
+    background-color: #fff;
+}
+
+/*** Block Styles ***/
+/* Button */
+.button {
+    font-size: 16px;
+    padding: 13px 25px;
+    background: #fff;
+    margin-right: 20px;
+    color: #000 !important;
+    text-transform: capitalize;
+    overflow: hidden;
+    display: inline-block;
+    border-radius: 5px;
+    border: 1px solid;
+    -webkit-transition: all 0.4s ease-in-out;
+    transition: all 0.4s ease-in-out;
+}
+.button:hover {
+    cursor: pointer;
+    background-color: #000 !important;
+}
+.button.black {
+    margin: 0;
+    width: 100%;
+    border-radius: 3px;
+    background: #000 !important;
+    padding: 16px;
+}
+.button.black:hover {
+    color: #fff !important;
+}
+
+/*** Divider ***/
+.divider.center {
+    margin: 0 auto;
+}
+
+/* Slider */
+.slider {
+    margin-top: -100px !important;
+}
+.images-title img {
+  	-webkit-transition: .4s ease-in-out;
+    -o-transition: .4s ease-in-out;
+    transition: .4s ease-in-out;
+}
+.images-title:hover img {
+	opacity: 0.8;
+}
+
+/* Overlay */
+.about-colum .sppb-column-overlay,
+.pricing-center .sppb-column-overlay {
+    opacity: 0.9;
+}
+.us .sppb-row-overlay {
+    opacity: 0.7;
+}
+
+/* About */
+.about-check .left, .about-check .right {
+    float: left;
+    width: 49%;
+}
+.about-check .left {
+    margin-right: 2%;
+}
+.about-check ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    margin-bottom: 30px;
+}
+.about-check ul strong {
+    display: none;
+}
+.about-check ul em {
+    padding-right: 10px;
+}
+.about-img .sppb-media-content {
+    padding: 15px 10px 8px;
+}
+.about-img img {
+    width: 100%;
+}
+
+/* Services */
+.services-colum {
+    display: inline-block;
+    margin-bottom: 35px;
+}
+
+/* Testimonial */
+.testimonial-img img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+/*  Pricing */
+.button.btn-pricing {
+    background: #000 !important;
+}
+.button.btn-pricing:hover {
+    color: #fff !important;
+}
+
+/* Coaching */
+.coaching-item {
+    box-shadow: 0px 0px 10px 0px #bababa;
+    background-color: #EEEEEE;
+    margin-bottom: 30px;
+}
+.coaching-item .sppb-media-content {
+    padding: 20px;
+}
+.coaching-item .sppb-media-content .btn-coaching:hover {
+    color: #000 !important;
+}
+
+/* level */
+.level-colum {
+    border: 10px solid;
+    padding: 50px 0;
+}
+
+/* Counter */
+.counter-item .count, .counter-item #shiva {
+    line-height: 60px;
+    font-weight: 600;
+    font-size: 65px;
+}
+.counter-item h4 {
+    font-size: 16px;
+    font-weight: 400;
+    margin-top: 10px;
+    color: #fff;
+    font-style: italic;
+}
+
+/* Team */
+.team-item .shrewd_solution_icon li strong {
+    display: none;
+}
+.team-item .shrewd_solution_icon {
+    padding: 0px!important;
+    margin: 0;
+    width: 100%;
+}
+.team-item .shrewd_solution_icon li {
+    display: inline-block!important;
+}
+.team-item .shrewd_solution_icon li a {
+    font-size: 23px;
+    width: 42px;
+    position: relative;
+    line-height: 60px;
+    text-align: center;
+    border-radius: 50%;
+    margin: 0;
+    -webkit-transition: .5s;
+    transition: .5s;
+    display: inline-block;
+}
+.team-item .shrewd_solution_icon li a:hover {
+    color: #fff !important;
+}
+
+/* Say */
+.say .title-icon:before {
+    background: #fff !important;
+}
+.say .title-icon i {
+    color: #fff !important;
+}
+.say .button {
+    background: #ffc107 !important;
+}
+
+/* Questions */
+.questions .title-icon:before {
+    background: #fff !important;
+}
+.questions .title-icon i {
+    color: #fff !important;
+}
+
+/* subscribe */
+.subscribe-content {
+    padding: 30px 30px;
+    background: #323335;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+/* Bg Title */
+.bg-title .sppb-addon-content {
+    margin-top: -50px;
+}
+.bg-title h4 {
+    font-size: 55px;
+    font-weight: 600;
+}
+.bg-title h6 {
+    font-size: 15px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.63);
+} 
+
+/* Coaching */
+.coaching-item .sppb-img-container {
+    position: relative;
+}
+.coaching-item .sppb-img-container:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: #abc5024a;
+    display: inline-block;
+    z-index: 1;
+    opacity: 0;
+    -webkit-transition: .4s ease-in-out;
+    -o-transition: .4s ease-in-out;
+    transition: .4s ease-in-out;
+}
+.coaching-item:hover .sppb-img-container:before {
+    opacity: 1;
+}
+
+/* Step */
+.sppb-panel-title {
+    font-size: 16px;
+    color: #000;
+    font-style: italic;
+}
+
+/* Blog */
+.jmm-item .jmm-image.mod-article-image {
+  	overflow: hidden;
+}
+.jmm-image.mod-article-image img {
+  	transform: scale(1);
+  	-webkit-transition: .5s ease-in-out;
+    -o-transition: .5s ease-in-out;
+    transition: .5s ease-in-out;
+}
+.jmm-item:hover .jmm-image.mod-article-image img {
+  	transform: scale(1.12);
+  	filter: grayscale(100%);
+}
+
+/* Contact Info */
+.contact-info h2, .contact-info h3 {
+    font-size: 25px;
+}
+button.btn.btn-primary.validate {
+    color: #fff !important;
+    padding: 13px 20px;
+}
+
+/* Bottom */
+#sp-bottom .sp-module .sp-module-title {
+    text-transform: uppercase;
+}
+#sp-bottom #sp-bottom1 h2 {
+    font-size: 50px;
+}
+#sp-bottom .sp-module ul > li {
+    margin-bottom: 0;
+}
+#sp-bottom a {
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 500;
+}
+#sp-bottom1 .shrewd_solution_icon {
+    margin: 0;
+    padding: 15px 0;
+    margin-top: 14px !important;
+}
+#sp-bottom1 .shrewd_solution_icon li {
+    position: relative;
+    display: inline-block !important;;
+    font-size: 17px;
+    font-weight: 500;
+}
+#sp-bottom1 .shrewd_solution_icon li a, #sp-bottom1 .shrewd_solution_icon li a:hover {
+    font-size: 18px;
+    height: 40px;
+    position: relative;
+    line-height: 45px;
+    color: #ffffff !important;
+    text-align: center;
+    border-radius: 50%;
+    margin-right: 15px;
+    -webkit-transition: .5s;
+    transition: .5s;
+    display: inline-block;
+}
+#sp-bottom1 .shrewd_solution_icon li strong {
+    display: none;
+}
+#sp-bottom4 .mkdf-btn-text {
+    position: relative;
+}
+#sp-bottom4 a {
+    border: 1px solid #fff;
+    margin-top: 10px;
+    display: inline-block;
+    padding: 7px 20px;
+    font-weight: 300;
+    text-transform: uppercase;
+    -webkit-transition: .5s;
+    transition: .5s;
+}
+#sp-bottom4 strong {
+    display: none;
+}
+#sp-bottom4 em {
+    padding-left: 10px;
+}
+
+/* Footer Copyright */
+#sp-footer {
+    text-align: center;
+    display: inline-block;
+    width: 100%;
+}
+#sp-footer .container-inner {
+    border-top: 1px solid #252525;
+}
+#sp-footer1 {
+  	padding-top: 5px;
+}
+
+/*** Responsive Layout ***/
+/* Tablet Landscape Layout */
+@media (min-width: 1400px) {
+    .sppb-row-container {
+      	max-width: 1320px;
+    }
+  .sp-megamenu-parent > li > a, .sp-megamenu-parent > li > span {
+    	padding: 0 25px;
+	}
+}
+
+/* Mobile Standard Layout */
+@media (max-width: 768px) {
+	#sp-header, #sp-header .logo {
+        height: 70px;
+    }
+  	#sp-footer p {
+  		text-align: center;
+	}
+  	body #sp-header {
+      	padding: 0;
+	}
+  	#sp-header {
+    	top: 0px;
+	}
+  	.jm-category-module.default .jmm-rows.rows-3 > div > .jmm-item {
+    	width: 98%;
+    	margin: 20px 1%;
+	}
+}
+
+/* Mobile Small Resolution */
+@media (max-width: 480px) {
+  	.category .sppb-column-addons .clearfix:nth-child(n+2) {
+    	width: 100%;
+    	margin-right: 0;
+	}
+}
+
+/* General color defination
+Color value depend on preset color that picking on template settings > Presets
+*/
+
+:root {
+  --background-color: currentColor;
+  --background: currentColor;
+  --text-color: currentColor;
+}
+.page-item.active .page-link, .sp-simpleportfolio .sp-simpleportfolio-filter>ul>li.active>a, a.hikabtn.hikacart,
+.sp-simpleportfolio .sp-simpleportfolio-item .sp-simpleportfolio-info:hover,
+.sp-simpleportfolio .sp-simpleportfolio-item .sp-simpleportfolio-overlay-wrapper .sp-simpleportfolio-overlay,
+.testimonial-column:after, .button, .about-colum .sppb-column-overlay, .about-img .sppb-media-content,
+.none, .pricing-center .sppb-column-overlay, .us > .sppb-row-overlay, .step-item .sppb-panel-heading {
+ 	background-color: var(--background-color) !important;
+}
+.article-list .article .readmore a:hover, .article-list .article .readmore a:active, .article-list .article .article-header h2 a:hover,
+.title h3, .button:hover, .about-check ul em, .services-item i, .testimonial-icon .sppb-icon-inner i,
+.button.btn-pricing, .button.black, .counter-item .count, .counter-item #shiva, #sp-menu ul.social-icons a {
+  	color: var(--text-color) !important; 
+}
+.divider, .button {
+  	border-color: var(--text-color) !important;
+}

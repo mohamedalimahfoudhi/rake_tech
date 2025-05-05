@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Maintenance{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_maintenance_index') }}">Maintenances</a></li>
+                <li class="breadcrumb-item active">Nouvelle Maintenance</li>
+            </ol>
+        </nav>
+
+        <div class="mb-4">
+            <h1>Créer une nouvelle maintenance</h1>
+        </div>
+
+        {{ include('maintenance/_form.html.twig') }}
+    </div>
+{% endblock %} 

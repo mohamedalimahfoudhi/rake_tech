@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Upcoming Tournaments - RackeTech{% endblock %}
+
+{% block body %}
+    <!-- Welcome Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Welcome, {{ app.user.prenom }}!</h2>
+        </div>
+    </div>
+
+    <!-- Upcoming Tournaments Section -->
+    <h1>Tournois à venir</h1>
+
+    {% if tournois is not empty %}
+        <div class="row">
+            {% for tournoi in tournois %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ tournoi.nom }}</h5>
+                            <p class="card-text">
+                                <strong>Date de début:</strong> {{ tournoi.datedebut|date('d/m/Y') }}<br>
+                                <strong>Lieu:</strong> {{ tournoi.lieu }}<br>
+                                <strong>Statut:</strong> {{ tournoi.statut }}<br>
+                                <strong>Récompense:</strong> {{ tournoi.recompense }}<br>
+                            </p>
+                            <!-- Button to Register -->
+                            {% if tournoi.statut == 'Prévu' %}
+                                {% if tournoi.id not in participatingTournamentIds %}
+                                    <form action="{{ path('tournoi_register', {'id': tournoi.id}) }}" method="POST">
+                                        <input type="hidden" name="token" value="{{ csrf_token('register_' ~ tournoi.id) }}">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-sign-in-alt"></i> Réserver
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <button class="btn btn-success" disabled>
+                                        <i class="fas fa-check"></i> Inscrit
+                                    </button>
+                                {% endif %}
+                            {% else %}
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="fas fa-lock"></i> Réservation fermée
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Aucun tournoi à venir.
+        </div>
+    {% endif %}
+{% endblock %}

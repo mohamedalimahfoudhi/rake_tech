@@ -1,0 +1,121 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Matériel{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Créer un nouveau matériel</h1>
+            <a href="{{ path('app_materiel_index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="card">
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.type, 'Type de matériel', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.type, {'attr': {'class': 'form-control' ~ (form.type.vars.valid ? '' : ' is-invalid'), 'placeholder': 'Ex: Raquette, Ballon...'}}) }}
+                                {{ form_errors(form.type) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.typesport, 'Type de sport', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.typesport, {'attr': {'class': 'form-control' ~ (form.typesport.vars.valid ? '' : ' is-invalid'), 'placeholder': 'Ex: Tennis, Football...'}}) }}
+                                {{ form_errors(form.typesport) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.prix, 'Prix', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.prix, {'attr': {'class': 'form-control' ~ (form.prix.vars.valid ? '' : ' is-invalid'), 'placeholder': '0.00'}}) }}
+                                {{ form_errors(form.prix) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.datereservation, 'Date de réservation', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.datereservation, {'attr': {'class': 'form-control' ~ (form.datereservation.vars.valid ? '' : ' is-invalid')}}) }}
+                                {{ form_errors(form.datereservation) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.statut, 'Statut', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.statut, {'attr': {'class': 'form-control' ~ (form.statut.vars.valid ? '' : ' is-invalid')}}) }}
+                                {{ form_errors(form.statut) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.ownertype, 'Type de propriétaire', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.ownertype, {'attr': {'class': 'form-control' ~ (form.ownertype.vars.valid ? '' : ' is-invalid')}}) }}
+                                {{ form_errors(form.ownertype) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('app_materiel_index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-label {
+            font-weight: 500;
+        }
+        .invalid-feedback {
+            display: block;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Enable Bootstrap form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+{% endblock %} 

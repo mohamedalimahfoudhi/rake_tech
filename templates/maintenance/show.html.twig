@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la Maintenance{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h4 mb-0">Détails de la Maintenance</h1>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr>
+                                <th class="w-25">ID</th>
+                                <td>{{ maintenance.maintenanceid }}</td>
+                            </tr>
+                            <tr>
+                                <th>Date de Maintenance</th>
+                                <td>{{ maintenance.datemaintenance ? maintenance.datemaintenance|date('d/m/Y') : '' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Description</th>
+                                <td>{{ maintenance.description }}</td>
+                            </tr>
+                            <tr>
+                                <th>Statut</th>
+                                <td>
+                                    {% if maintenance.statutmaintenance == 'Planifié' %}
+                                        <span class="badge bg-warning">{{ maintenance.statutmaintenance }}</span>
+                                    {% elseif maintenance.statutmaintenance == 'En cours' %}
+                                        <span class="badge bg-info">{{ maintenance.statutmaintenance }}</span>
+                                    {% elseif maintenance.statutmaintenance == 'Terminé' %}
+                                        <span class="badge bg-success">{{ maintenance.statutmaintenance }}</span>
+                                    {% endif %}
+
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Matériel</th>
+                                <td>
+                                    {% if maintenance.materielid %}
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-tools me-2"></i>
+                                            <div>
+                                                <strong>{{ maintenance.materielid.type }}</strong>
+                                                <div class="text-muted small">
+                                                    Sport: {{ maintenance.materielid.typesport }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">Aucun matériel associé</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a href="{{ path('app_maintenance_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+                    <div>
+                        <a href="{{ path('app_maintenance_edit', {'id': maintenance.maintenanceid}) }}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        {{ include('maintenance/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.8em;
+    }
+    th {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %} 

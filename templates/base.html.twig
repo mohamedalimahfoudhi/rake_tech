@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - RackeTech</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🎾</text></svg>">
+    
+    <!-- Link to CSS built by Webpack Encore using asset() function in Twig -->
+    <link rel="stylesheet" href="{{ asset('build/app.css') }}">
+    
+    <!-- Bootstrap CSS (external CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- FullCalendar CSS (CDN version) -->
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.0.0/main.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.0.0/main.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.0.0/main.css" rel="stylesheet">
+
+
+    
+    <!-- FontAwesome Icons (external CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Other custom styles (if needed) -->
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <!-- Other JavaScript libraries (external CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Scripts built by Webpack Encore using asset() function in Twig -->
+    <script src="{{ asset('build/runtime.js') }}" defer></script>
+    <script src="{{ asset('build/app.js') }}" type="module" defer></script>
+</head>
+
+    <body class="bg-light">
+        {% if not is_granted('ROLE_ADMIN') %}
+            <!-- Main Navigation (Non-Admin) -->
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="{{ path('app_dashboard') }}">
+                        <div class="logo">
+                            <span class="logo-racket">🎾</span>
+                            <span class="logo-text">RackeTech</span>
+                        </div>
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav me-auto">
+                            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('app_dashboard') }}">
+                                        <i class="fas fa-home me-1"></i> Dashboard
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('app_profile') }}">
+                                        <i class="fas fa-user me-1"></i> Profile
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                        <ul class="navbar-nav">
+                            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-user-circle me-1"></i> {{ app.user.prenom }}
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{{ path('app_profile') }}">Profile</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_logout') }}">Logout</a></li>
+                                    </ul>
+                                </li>
+                            {% else %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('app_login') }}">Login</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('app_register') }}">Register</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- User Type Navigation (Non-Admin) -->
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                    <div class="container-fluid">
+                        <div class="collapse navbar-collapse" id="userTypeNav">
+                            <ul class="navbar-nav">
+                                {% if is_granted('ROLE_USER') %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('app_user_dashboard') }}">
+                                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('app_profile') }}">
+                                            <i class="fas fa-user me-1"></i> Profile
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <i class="fas fa-calendar me-1"></i> Events
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <i class="fas fa-history me-1"></i> History
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <i class="fas fa-map-marker-alt me-1"></i> Courts
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <i class="fas fa-user-friends me-1"></i> Players
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if is_granted('ROLE_ORGANIZER') %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('app_organizer_dashboard') }}">
+                                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('app_profile') }}">
+                                            <i class="fas fa-user me-1"></i> Profile
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <i class="fas fa-plus-circle me-1"></i> Create Event
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <i class="fas fa-tasks me-1"></i> Manage Events
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <i class="fas fa-users me-1"></i> Manage Participants
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <i class="fas fa-chart-bar me-1"></i> Reports
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <i class="fas fa-cog me-1"></i> Settings
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if is_granted('ROLE_ATHLETE') %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('app_athlete_dashboard') }}">
+                                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('app_profile') }}">
+                                            <i class="fas fa-user me-1"></i> Profile
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <i class="fas fa-running me-1"></i> Training
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">  
+                                        <a class="nav-link" href="{{ path('app_tournoi_avenir') }}">
+                                            <i class="fas fa-trophy me-1"></i> Competitions
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('mes_reservations') }}">
+                                            <i class="fas fa-calendar-check me-1"></i> Schedule
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('app_athlethe_materiels') }}">
+                                            <i class="fas fa-chart-line me-1"></i> Materiels
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('mes_materiels_athlete') }}">
+                                            <i class="fas fa-medal me-1"></i> List materiels
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            {% endif %}
+        {% endif %}
+
+        <!-- Main Content -->
+        <main class="container-fluid py-4">
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% block body %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer mt-auto py-3 bg-dark text-white">
+            <div class="container text-center">
+                <span>&copy; {{ "now"|date("Y") }} RackeTech. All rights reserved.</span>
+            </div>
+        </footer>
+    </body>
+</html>
