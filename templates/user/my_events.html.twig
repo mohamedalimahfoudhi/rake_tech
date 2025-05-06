@@ -1,0 +1,176 @@
+{% extends 'user/layout.html.twig' %}
+
+{% block user_content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+        <h1 class="h2">My Events</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ path('user_create_event') }}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i> Create New Event
+            </a>
+        </div>
+    </div>
+
+    <!-- My Events Table -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-calendar-alt me-1"></i>
+            Events I'm Organizing
+        </div>
+        <div class="card-body">
+            {% if my_events|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Tickets</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in my_events %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ path('event_details', {'id': event.ID}) }}" class="text-decoration-none">
+                                            {{ event.nom }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if event.type == 'concert' %}bg-danger{% elseif event.type == 'conference' %}bg-primary{% elseif event.type == 'workshop' %}bg-success{% elseif event.type == 'seminar' %}bg-info{% else %}bg-secondary{% endif %}">
+                                            {{ event.type }}
+                                        </span>
+                                    </td>
+                                    <td>{{ event.dateDebut|date('d/m/Y') }}</td>
+                                    <td>{{ event.lieu }}</td>
+                                    <td>
+                                        <span class="badge {% if event.statut == 'active' %}bg-success{% elseif event.statut == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %}">
+                                            {{ event.statut|capitalize }}
+                                        </span>
+                                    </td>
+                                    <td>{{ event.billets|length }} tickets</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ path('event_details', {'id': event.ID}) }}" class="btn btn-sm btn-info" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ path('user_edit_event', {'id': event.ID}) }}" class="btn btn-sm btn-primary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" title="Cancel" data-bs-toggle="modal" data-bs-target="#cancelEventModal{{ event.ID }}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Cancel Event Modal -->
+                                        <div class="modal fade" id="cancelEventModal{{ event.ID }}" tabindex="-1" aria-labelledby="cancelEventModalLabel{{ event.ID }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="cancelEventModalLabel{{ event.ID }}">Cancel Event</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to cancel the event: <strong>{{ event.nom }}</strong>?</p>
+                                                        <p class="text-danger">This will notify all ticket holders and mark the event as cancelled.</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <a href="#" class="btn btn-danger">Cancel Event</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You don't have any events yet. <a href="{{ path('user_create_event') }}">Create your first event</a> to get started!
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Event Stats -->
+    {% if my_events|length > 0 %}
+        <div class="row mb-4">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <div class="card bg-primary text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title">Total Events</h5>
+                                <h2 class="display-4">{{ my_events|length }}</h2>
+                            </div>
+                            <i class="fas fa-calendar-alt fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title">Active Events</h5>
+                                <h2 class="display-4">{{ my_events|filter(e => e.statut == 'active')|length }}</h2>
+                            </div>
+                            <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title">Total Participants</h5>
+                                <h2 class="display-4">{{ my_events|map(e => e.nbParticipants)|reduce((carry, v) => carry + v, 0) }}</h2>
+                            </div>
+                            <i class="fas fa-users fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Event Creation Tips -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <i class="fas fa-lightbulb me-2 text-warning"></i>
+            Tips for Event Organizers
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Creating Successful Events</h5>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Create a compelling event description</li>
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Choose an accessible location</li>
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Set appropriate ticket prices</li>
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Promote your event on social media</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5>Managing Your Events</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Regularly update event details</li>
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Monitor ticket sales</li>
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Communicate with attendees</li>
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Collect feedback after the event</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

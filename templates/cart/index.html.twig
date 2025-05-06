@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticket Calculator{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4">Ticket Price Calculator</h1>
+    
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% if cart|length > 0 %}
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Selected Tickets</h5>
+                <a href="{{ path('cart_clear') }}" class="btn btn-sm btn-outline-light" onclick="return confirm('Are you sure you want to clear all tickets?')">
+                    <i class="fas fa-trash"></i> Clear All
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Ticket Type</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, item in cart %}
+                                <tr>
+                                    <td>{{ item.event_name }}</td>
+                                    <td>{{ item.type }}</td>
+                                    <td>{{ item.price|number_format(2) }} €</td>
+                                    <td>
+                                        <form action="{{ path('cart_update', {'id': id}) }}" method="post" class="quantity-form">
+                                            <div class="input-group">
+                                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm" style="max-width: 70px;">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td>{{ (item.price * item.quantity)|number_format(2) }} €</td>
+                                    <td>
+                                        <a href="{{ path('cart_remove', {'id': id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to remove this ticket?')">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-active">
+                                <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                                <td colspan="2"><strong>{{ total|number_format(2) }} €</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ path('admin_tickets') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Continue Adding Tickets
+                </a>
+                <div class="alert alert-success mb-0 p-2">
+                    <strong>Total Price: {{ total|number_format(2) }} €</strong>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>No tickets added yet.</p>
+            <a href="{{ path('admin_tickets') }}" class="btn btn-primary mt-2">
+                <i class="fas fa-ticket-alt"></i> Browse Tickets
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-submit quantity forms when values change
+        const quantityInputs = document.querySelectorAll('.quantity-form input');
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                this.closest('form').submit();
+            });
+        });
+    });
+</script>
+{% endblock %} 

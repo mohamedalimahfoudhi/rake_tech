@@ -1,0 +1,24 @@
+<!-- Delete Modal for Ticket ID: {{ ticket.ID }} -->
+<div class="modal fade" id="deleteTicketModal_{{ ticket.ID }}" tabindex="-1" aria-labelledby="deleteTicketModalLabel_{{ ticket.ID }}" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title visually-hidden" id="deleteTicketModalLabel_{{ ticket.ID }}">Confirm Deletion</h5> 
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{{ path('admin_ticket_delete', {'id': ticket.ID}) }}">
+                <div class="modal-body text-center pb-0">
+                    <div class="mb-3">
+                        <i class="fas fa-exclamation-triangle text-warning fa-3x"></i>
+                    </div>
+                    <p>Are you sure you want to delete ticket #{{ ticket.ID }}?</p>
+                    <p class="text-danger mb-1"><small>This action cannot be undone.</small></p>
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

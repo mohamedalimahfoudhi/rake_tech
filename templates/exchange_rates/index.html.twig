@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Exchange Rates{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .exchange-rates-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .currency-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        .currency-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .nav-pills .nav-link.active {
+            background-color: #7494ec;
+        }
+        .nav-pills .nav-link {
+            color: #333;
+            border-radius: 30px;
+            padding: 8px 20px;
+            margin: 0 5px;
+        }
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .back-button i {
+            margin-right: 8px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <a href="{{ path('app_dashboard') }}" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    
+    <div class="exchange-rates-container">
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <h1 class="h2 mb-0">Exchange Rates</h1>
+                <p class="text-muted">Real-time currency conversion</p>
+            </div>
+            <div class="col-lg-6 text-end">
+                {% if latest_rates.timestamp is defined %}
+                    <p class="mb-0">Last updated: {{ latest_rates.timestamp|date('Y-m-d H:i:s') }}</p>
+                    <p class="text-muted">Base currency: {{ latest_rates.base }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Navigation tabs -->
+        <ul class="nav nav-pills mb-4">
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ path('exchange_rates') }}">Latest Rates</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates_convert') }}">Currency Converter</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates_historical') }}">Historical Data</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates_timeseries') }}">Time Series</a>
+            </li>
+        </ul>
+
+        <!-- Error message display -->
+        {% if latest_rates.error is defined %}
+            <div class="alert alert-danger">
+                <p class="mb-0">Error: {{ latest_rates.error }}</p>
+            </div>
+        {% endif %}
+
+        <!-- Rates display -->
+        {% if latest_rates.rates is defined %}
+            <div class="row">
+                {% for currency, rate in latest_rates.rates %}
+                    <div class="col-md-3 col-sm-6">
+                        <div class="currency-card">
+                            <h4 class="currency-code">{{ currency }}</h4>
+                            <p class="currency-rate mb-0">{{ rate }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %} 

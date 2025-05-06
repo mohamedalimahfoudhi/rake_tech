@@ -1,0 +1,167 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Add Tickets to {{ event.nom }}{% endblock %}
+
+{% block body %}
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">Add Tickets to Event</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="{{ path('admin_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_events') }}">Events</a></li>
+            <li class="breadcrumb-item active">Add Tickets</li>
+        </ol>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-ticket-alt me-1"></i>
+                Create New Tickets for "{{ event.nom }}"
+            </div>
+            <div class="card-body">
+                {% for message in app.flashes('error') %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+                
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You are adding tickets for <strong>{{ event.nom }}</strong> (ID: {{ event.id }}).
+                    Event status is currently <strong>{{ event.statut|default('Not set') }}</strong>.
+                    {% if event.statut != 'En cours' %}
+                        <div class="mt-2">
+                            <a href="{{ path('admin_event_update_status', {'id': event.id, 'status': 'En cours'}) }}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-check-circle me-1"></i> Set Status to "En cours"
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <form method="post" action="{{ path('admin_event_add_tickets', {'id': event.id}) }}" class="needs-validation" novalidate>
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="ticketType" class="form-label">Ticket Type</label>
+                                <select class="form-select {% if errors is defined and errors.ticketType is defined %}is-invalid{% endif %}" 
+                                       id="ticketType" name="ticketType" required>
+                                    <option value="" disabled selected>Select type...</option>
+                                    <option value="Gradin">Gradin</option>
+                                    <option value="Virage">Virage</option>
+                                    <option value="VIP">VIP</option>
+                                </select>
+                                <div class="form-text">Matches database enum: Gradin, Virage, VIP</div>
+                                {% if errors is defined and errors.ticketType is defined %}
+                                    <div class="invalid-feedback">
+                                        {{ errors.ticketType }}
+                                    </div>
+                                {% else %}
+                                    <div class="invalid-feedback">
+                                        Please select a ticket type.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select {% if errors is defined and errors.status is defined %}is-invalid{% endif %}" 
+                                       id="status" name="status" required>
+                                    <option value="Valide" selected>Valide</option>
+                                    <option value="Annulé">Annulé</option>
+                                    <option value="Non valide">Non valide</option>
+                                </select>
+                                <div class="form-text">Matches database enum: Valide, Annulé, Non valide</div>
+                                {% if errors is defined and errors.status is defined %}
+                                    <div class="invalid-feedback">
+                                        {{ errors.status }}
+                                    </div>
+                                {% else %}
+                                    <div class="invalid-feedback">
+                                        Please select a status.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="price" class="form-label">Price</label>
+                                <div class="input-group has-validation">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" 
+                                           class="form-control {% if errors is defined and errors.price is defined %}is-invalid{% endif %}" 
+                                           id="price" name="price" min="1" step="0.01" value="15.00" required>
+                                    {% if errors is defined and errors.price is defined %}
+                                        <div class="invalid-feedback">
+                                            {{ errors.price }}
+                                        </div>
+                                    {% else %}
+                                        <div class="invalid-feedback">
+                                            Please enter a valid price (minimum $1).
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">Quantity</label>
+                                <input type="number" 
+                                       class="form-control {% if errors is defined and errors.quantity is defined %}is-invalid{% endif %}" 
+                                       id="quantity" name="quantity" min="1" value="100" required>
+                                {% if errors is defined and errors.quantity is defined %}
+                                    <div class="invalid-feedback">
+                                        {{ errors.quantity }}
+                                    </div>
+                                {% else %}
+                                    <div class="invalid-feedback">
+                                        Please enter a valid quantity (minimum 1).
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-1"></i>
+                        Add Tickets
+                    </button>
+                    <a href="{{ path('admin_events') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Back to Events
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function() {
+        'use strict';
+        
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+    </script>
+{% endblock %} 

@@ -1,0 +1,1114 @@
+{% extends 'user/layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --tennis-green: #2ecc71;
+            --tennis-light-green: #a8e6cf;
+            --tennis-yellow: #f1c40f;
+            --tennis-light-yellow: #ffd93d;
+            --tennis-dark: #27ae60;
+            --text-dark: #2c3e50;
+            --text-muted: #666666;
+        }
+        
+        body {
+            background: #f5f7fa;
+            color: var(--text-dark);
+        }
+        
+        .text-primary-gradient {
+            background: linear-gradient(45deg, var(--tennis-green), var(--tennis-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+        
+        .border-primary {
+            border-color: var(--tennis-green) !important;
+        }
+        
+        .breadcrumb {
+            background: rgba(46, 204, 113, 0.1);
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            backdrop-filter: blur(8px);
+        }
+        
+        .breadcrumb-item a {
+            color: var(--tennis-green);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .breadcrumb-item a:hover {
+            color: var(--tennis-dark);
+        }
+        
+        .breadcrumb-item.active {
+            color: var(--text-dark);
+        }
+        
+        .breadcrumb-item+.breadcrumb-item::before {
+            color: var(--text-dark);
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            box-shadow: 0 4px 6px rgba(46, 204, 113, 0.1);
+            backdrop-filter: blur(12px);
+        }
+        
+        .card-header {
+            background: rgba(46, 204, 113, 0.1);
+            border-bottom: 1px solid rgba(46, 204, 113, 0.2);
+            font-weight: 600;
+            padding: 16px;
+            color: var(--tennis-dark);
+        }
+        
+        .btn-book {
+            background: linear-gradient(45deg, var(--tennis-green), var(--tennis-yellow));
+            border: none;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            padding: 12px 24px;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+        }
+        
+        .btn-book:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+            color: white;
+        }
+        
+        .ticket-option {
+            background: rgba(46, 204, 113, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(46, 204, 113, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .ticket-option:hover {
+            background: rgba(46, 204, 113, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.1);
+        }
+        
+        .ticket-price {
+            color: var(--tennis-green);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .qty-btn {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            color: var(--tennis-dark);
+            transition: all 0.3s;
+        }
+        
+        .qty-btn:hover {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--tennis-dark);
+        }
+        
+        .qty-input {
+            border-color: rgba(46, 204, 113, 0.2);
+            color: var(--tennis-dark);
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .total-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--tennis-dark);
+            background: linear-gradient(45deg, var(--tennis-green), var(--tennis-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .event-meta i {
+            color: var(--tennis-green);
+        }
+        
+        .info-icon {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-size: 16px;
+        }
+        
+        .icon-calendar {
+            background: var(--tennis-green);
+            color: #fff;
+        }
+        
+        .icon-location {
+            background: var(--tennis-yellow);
+            color: #fff;
+        }
+        
+        .icon-info {
+            background: var(--gray);
+            color: #fff;
+        }
+        
+        .sticky-top {
+            z-index: 990;
+        }
+        
+        .list-group-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(46, 204, 113, 0.2);
+            color: var(--text-dark);
+        }
+        
+        .social-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            color: #fff;
+            border: none;
+            transition: all 0.3s;
+            margin: 0 4px;
+        }
+        
+        .social-facebook {
+            background: #3b5998;
+        }
+        
+        .social-twitter {
+            background: #1da1f2;
+        }
+        
+        .social-whatsapp {
+            background: #25d366;
+        }
+        
+        .social-email {
+            background: var(--accent);
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+        
+        .event-meta .text-muted {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+        }
+        
+        .event-meta strong {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        
+        .badge {
+            font-weight: 600;
+        }
+        
+        .badge.bg-paddel {
+            background: var(--tennis-green);
+            color: white;
+        }
+        
+        .badge.bg-terrain {
+            background: var(--tennis-yellow);
+            color: var(--text-dark);
+        }
+        
+        .form-check-label {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        
+        .alert {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+        }
+        
+        .alert-warning {
+            background: rgba(241, 196, 15, 0.1);
+            border-color: rgba(241, 196, 15, 0.2);
+            color: #926c00;
+        }
+        
+        .alert-success {
+            background: rgba(46, 204, 113, 0.1);
+            border-color: rgba(46, 204, 113, 0.2);
+            color: #1b7943;
+        }
+        
+        .alert-danger {
+            background: rgba(231, 76, 60, 0.1);
+            border-color: rgba(231, 76, 60, 0.2);
+            color: #a43121;
+        }
+        
+        /* Add pulse animation for total price updates */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 0.3s ease-in-out;
+        }
+        
+        /* Add styling for active quantity buttons */
+        .qty-btn.active {
+            background: rgba(46, 204, 113, 0.3);
+            transform: scale(0.95);
+        }
+        
+        /* Improve button disabled state */
+        .btn-book:disabled {
+            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        .price-breakdown {
+            background-color: rgba(46, 204, 113, 0.05);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .pulse {
+            animation: pulse-animation 0.5s;
+        }
+        
+        @keyframes pulse-animation {
+            0% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.05);
+            }
+            50% {
+                transform: scale(1);
+            }
+            75% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .qty-btn.active {
+            background-color: rgba(46, 204, 113, 0.3);
+        }
+        
+        /* Make quantity controls more visible when active */
+        .ticket-quantity {
+            transition: all 0.3s ease;
+        }
+        
+        .ticket-quantity.visible {
+            animation: fade-in 0.3s;
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Price breakdown styles */
+        .price-breakdown {
+            border-top: 1px dashed rgba(46, 204, 113, 0.3);
+            border-bottom: 1px dashed rgba(46, 204, 113, 0.3);
+            margin-bottom: 15px;
+            padding: 10px 5px;
+        }
+        
+        .price-change {
+            color: var(--tennis-green);
+            font-weight: bold;
+            animation: flash 1s;
+        }
+        
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Ticket filtering styles */
+        .ticket-filter-container {
+            background: rgba(46, 204, 113, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(46, 204, 113, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .ticket-filter-label {
+            color: var(--tennis-dark);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .ticket-type-btn {
+            background: white;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: var(--text-dark);
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .ticket-type-btn:hover {
+            background-color: rgba(46, 204, 113, 0.1);
+            border-color: var(--tennis-green);
+            transform: translateY(-2px);
+        }
+        
+        .ticket-type-btn.active {
+            background: linear-gradient(45deg, var(--tennis-green), var(--tennis-dark));
+            border-color: var(--tennis-dark);
+            color: white;
+            box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+        }
+        
+        .ticket-option.filtered-out {
+            display: none;
+            animation: fade-out 0.3s;
+        }
+        
+        @keyframes fade-out {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Badge for showing ticket type in ticket option */
+        .ticket-type-badge {
+            display: inline-block;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 6px;
+            background: var(--tennis-light-green);
+            color: var(--text-dark);
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .ticket-filter-container {
+                padding: 10px;
+            }
+            
+            .ticket-type-btn {
+                padding: 4px 8px;
+                font-size: 0.8rem;
+                margin-right: 4px;
+                margin-bottom: 6px;
+            }
+            
+            .ticket-type-filters {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block user_content %}
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('user_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('user_events') }}">Events</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ event.nom }}</li>
+        </ol>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <!-- Event Details Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h1 class="card-title h3 text-primary-gradient">{{ event.nom }}</h1>
+                        <span class="badge {% if event.type == 'TERRAIN' %}bg-terrain{% elseif event.type == 'PADDEL' %}bg-paddel{% else %}bg-secondary{% endif %} fs-6">
+                            {{ event.type }}
+                        </span>
+                    </div>
+                    
+                    <div class="event-meta mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="info-icon icon-calendar"><i class="fas fa-calendar-alt"></i></span>
+                                    <div>
+                                        <div class="text-muted">Start - End Date</div>
+                                        <strong>{{ event.dateDebut|date('d M Y') }} - {{ event.dateFin|date('d M Y') }}</strong>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="info-icon icon-calendar"><i class="fas fa-clock"></i></span>
+                                    <div>
+                                        <div class="text-muted">Event Time</div>
+                                        <strong>{{ event.dateDebut|date('H:i') }} - {{ event.dateFin|date('H:i') }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="info-icon icon-location"><i class="fas fa-map-marker-alt"></i></span>
+                                    <div>
+                                        <div class="text-muted">Event Type</div>
+                                        <strong>{{ event.type }}</strong>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="info-icon icon-info"><i class="fas fa-user"></i></span>
+                                    <div>
+                                        <div class="text-muted">Organizer</div>
+                                        <strong>Event Admin</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="event-description mb-4">
+                        <h5 class="text-primary-gradient">Description</h5>
+                        <p>{{ event.details }}</p>
+                    </div>
+                    
+                    <div class="event-status mb-3">
+                        <div class="alert {% if event.statut == 'En cours' %}alert-success{% elseif event.statut == 'Annulé' %}alert-danger{% else %}alert-warning{% endif %}">
+                            <i class="fas {% if event.statut == 'En cours' %}fa-check-circle{% elseif event.statut == 'Annulé' %}fa-times-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+                            Status: <strong>{{ event.statut|default('Pending') }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Event Location/Map Placeholder -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-map-marked-alt me-2"></i>
+                    Event Location
+                </div>
+                <div class="card-body">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9916256937586!2d2.292292615509614!3d48.85837007928757!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e2964e34e2d%3A0x8ddca9ee380ef7e0!2sEiffel%20Tower!5e0!3m2!1sen!2sus!4v1644979840188!5m2!1sen!2sus" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Ticket Booking Card -->
+            <div class="card sticky-top mb-4" style="top: 20px;">
+                <div class="card-header">
+                    <i class="fas fa-ticket-alt me-2"></i>
+                    Book Tickets
+                </div>
+                <div class="card-body">
+                    {% if event.statut == 'En cours' or event.statut is empty %}
+                        {% if tickets is empty or tickets|length == 0 %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i> 
+                                No tickets available for this event at the moment.
+                            </div>
+                        {% else %}
+                            {% set totalQuantity = 0 %}
+                            {% for ticket in tickets %}
+                                {% set totalQuantity = totalQuantity + ticket.quantite %}
+                            {% endfor %}
+                            
+                            {% if totalQuantity <= 0 %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i> 
+                                    All tickets have been sold out.
+                                </div>
+                            {% else %}
+                                <!-- Ticket Type Filter -->
+                                <div class="ticket-filter-container mb-4">
+                                    <div class="ticket-filter-label">
+                                        <i class="fas fa-filter me-2"></i>Filter by Ticket Type
+                                    </div>
+                                    <div class="ticket-type-filters">
+                                        <button type="button" class="ticket-type-btn active" data-filter="all">
+                                            All Types
+                                            <span class="badge rounded-pill bg-light text-dark ms-1">{{ totalQuantity }}</span>
+                                        </button>
+                                        {% set ticketTypes = [] %}
+                                        {% for ticket in tickets %}
+                                            {% if ticket.typeBillet not in ticketTypes and ticket.quantite > 0 %}
+                                                {% set ticketTypes = ticketTypes|merge([ticket.typeBillet]) %}
+                                                <!-- Calculate number of tickets for this type -->
+                                                {% set typeCount = 0 %}
+                                                {% for t in tickets %}
+                                                    {% if t.typeBillet == ticket.typeBillet and t.quantite > 0 %}
+                                                        {% set typeCount = typeCount + t.quantite %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <button type="button" class="ticket-type-btn" data-filter="{{ ticket.typeBillet }}">
+                                                    {{ ticket.typeBillet }}
+                                                    <span class="badge rounded-pill bg-light text-dark ms-1">{{ typeCount }}</span>
+                                                </button>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <form id="ticketForm" method="post" action="{{ path('book_tickets', {'id': event.id}) }}">
+                                    <div class="mb-4">
+                                        {% for ticket in tickets %}
+                                            {% if ticket.quantite > 0 %}
+                                                <div class="ticket-option" data-ticket-type="{{ ticket.typeBillet }}">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input ticket-checkbox" 
+                                                                    type="checkbox" 
+                                                                    name="tickets[{{ ticket.id }}][selected]" 
+                                                                    id="ticket{{ ticket.id }}" 
+                                                                    data-price="{{ ticket.prix }}">
+                                                                <label class="form-check-label" for="ticket{{ ticket.id }}">
+                                                                    <strong>{{ ticket.typeBillet }}</strong>
+                                                                </label>
+                                                            </div>
+                                                            <div class="ticket-price mt-1">${{ ticket.prix|number_format(2) }}</div>
+                                                            <div class="small text-muted mt-1">
+                                                                <i class="fas fa-ticket-alt me-1"></i>
+                                                                {{ ticket.quantite }} tickets available
+                                                            </div>
+                                                        </div>
+                                                        <div class="ticket-quantity" style="display: none;">
+                                                            <div class="input-group" style="width: 120px;">
+                                                                <button type="button" class="btn btn-sm qty-btn" data-action="decrease">
+                                                                    <i class="fas fa-minus"></i>
+                                                                </button>
+                                                                <input type="number" 
+                                                                    class="form-control form-control-sm qty-input" 
+                                                                    name="tickets[{{ ticket.id }}][quantity]" 
+                                                                    min="0" 
+                                                                    max="{{ ticket.quantite }}" 
+                                                                    value="0">
+                                                                <button type="button" class="btn btn-sm qty-btn" data-action="increase">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="total-price">
+                                            Total: <span id="totalPrice">$0.00</span>
+                                        </div>
+                                        <button type="submit" class="btn btn-book">
+                                            <i class="fas fa-shopping-cart me-2"></i> Book Now
+                                        </button>
+                                    </div>
+                                </form>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-clock me-2"></i>
+                            This event is not currently open for booking.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Event Details Summary -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Event Information
+                </div>
+                <div class="card-body">
+                    {% for message in app.flashes('info') %}
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                    
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-users text-primary me-2"></i> Max Participants:</span>
+                            <span class="badge bg-paddel rounded-pill">{{ event.participantsMax }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-ticket-alt text-secondary me-2"></i> Available Tickets:</span>
+                            <span class="badge bg-terrain rounded-pill">
+                                {% set totalAvailable = 0 %}
+                                {% for ticket in tickets %}
+                                    {% set totalAvailable = totalAvailable + ticket.quantite %}
+                                {% endfor %}
+                                {{ totalAvailable }}
+                            </span>
+                            <span class="small text-muted">(Event ID: {{ event.id }})</span>
+                        </li>
+                        <!-- Add ticket type summary -->
+                        {% set ticketTypes = [] %}
+                        {% for ticket in tickets %}
+                            {% if ticket.typeBillet not in ticketTypes and ticket.quantite > 0 %}
+                                {% set ticketTypes = ticketTypes|merge([ticket.typeBillet]) %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if ticketTypes|length > 0 %}
+                        <li class="list-group-item">
+                            <div><i class="fas fa-tags text-success me-2"></i> Ticket Types:</div>
+                            <div class="mt-2">
+                                {% for type in ticketTypes %}
+                                    <span class="badge bg-light text-dark border border-success me-1 mb-1">{{ type }}</span>
+                                {% endfor %}
+                            </div>
+                        </li>
+                        {% endif %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-star text-warning me-2"></i> Rating:</span>
+                            <div>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                                <span class="ms-1">(4.5)</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Share Event -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-share-alt me-2"></i>
+                    Share This Event
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-center">
+                        <a href="#" class="social-btn social-facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-btn social-twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-btn social-whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="#" class="social-btn social-email">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ticketCheckboxes = document.querySelectorAll('.ticket-checkbox');
+            const qtyInputs = document.querySelectorAll('.qty-input');
+            const qtyBtns = document.querySelectorAll('.qty-btn');
+            const totalPriceElement = document.getElementById('totalPrice');
+            const ticketForm = document.getElementById('ticketForm');
+            
+            // Ticket type filtering
+            const filterButtons = document.querySelectorAll('.ticket-type-btn');
+            const ticketOptions = document.querySelectorAll('.ticket-option');
+            
+            // Handle filter button clicks
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Add a small bounce animation to the clicked button
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                    
+                    const filterValue = this.dataset.filter;
+                    
+                    // Filter tickets based on selected type
+                    ticketOptions.forEach(option => {
+                        if (filterValue === 'all' || option.dataset.ticketType === filterValue) {
+                            option.classList.remove('filtered-out');
+                            // Add animation for appearing tickets
+                            option.style.animation = 'fade-in 0.3s';
+                        } else {
+                            option.classList.add('filtered-out');
+                        }
+                    });
+                    
+                    // Uncheck checkboxes and reset quantities for filtered-out tickets
+                    ticketOptions.forEach(option => {
+                        if (option.classList.contains('filtered-out')) {
+                            const checkbox = option.querySelector('.ticket-checkbox');
+                            const qtyInput = option.querySelector('.qty-input');
+                            const quantityDiv = option.querySelector('.ticket-quantity');
+                            
+                            if (checkbox && checkbox.checked) {
+                                checkbox.checked = false;
+                                if (qtyInput) qtyInput.value = 0;
+                                if (quantityDiv) quantityDiv.style.display = 'none';
+                            }
+                        }
+                    });
+                    
+                    // Update total price after filtering
+                    updateTotalPrice();
+                });
+            });
+            
+            // Initialize total on page load
+            updateTotalPrice(false);
+            
+            // Handle checkbox change
+            ticketCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const ticketOption = this.closest('.ticket-option');
+                    const quantityDiv = ticketOption.querySelector('.ticket-quantity');
+                    const qtyInput = ticketOption.querySelector('.qty-input');
+                    
+                    if (this.checked) {
+                        quantityDiv.style.display = 'block';
+                        // Add visible class to trigger animation
+                        setTimeout(() => {
+                            quantityDiv.classList.add('visible');
+                        }, 10);
+                        
+                        if (parseInt(qtyInput.value) === 0) {
+                            qtyInput.value = 1;
+                        }
+                        ticketOption.style.background = 'rgba(46, 204, 113, 0.1)';
+                        ticketOption.style.boxShadow = '0 4px 10px rgba(46, 204, 113, 0.15)';
+                        ticketOption.style.transform = 'translateY(-2px)';
+                    } else {
+                        quantityDiv.classList.remove('visible');
+                        // Wait for animation to finish before hiding
+                        setTimeout(() => {
+                            quantityDiv.style.display = 'none';
+                        }, 300);
+                        
+                        qtyInput.value = 0;
+                        ticketOption.style.background = 'rgba(46, 204, 113, 0.05)';
+                        ticketOption.style.boxShadow = 'none';
+                        ticketOption.style.transform = 'translateY(0)';
+                    }
+                    
+                    updateTotalPrice();
+                });
+            });
+            
+            // Handle quantity buttons
+            qtyBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const input = this.closest('.input-group').querySelector('.qty-input');
+                    const currentValue = parseInt(input.value) || 0;
+                    const max = parseInt(input.getAttribute('max')) || 99;
+                    const oldValue = currentValue;
+                    let newValue = currentValue;
+                    
+                    if (this.dataset.action === 'increase' && currentValue < max) {
+                        newValue = currentValue + 1;
+                        input.value = newValue;
+                        
+                        // Visual feedback on button click
+                        this.classList.add('active');
+                        setTimeout(() => {
+                            this.classList.remove('active');
+                        }, 200);
+                    } else if (this.dataset.action === 'decrease' && currentValue > 1) {
+                        newValue = currentValue - 1;
+                        input.value = newValue;
+                        
+                        // Visual feedback on button click
+                        this.classList.add('active');
+                        setTimeout(() => {
+                            this.classList.remove('active');
+                        }, 200);
+                    }
+                    
+                    // If value changed, add a highlight effect to the input
+                    if (oldValue !== newValue) {
+                        input.classList.add('price-change');
+                        setTimeout(() => {
+                            input.classList.remove('price-change');
+                        }, 1000);
+                    }
+                    
+                    updateTotalPrice();
+                });
+            });
+            
+            // Handle direct input changes
+            qtyInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    const max = parseInt(this.getAttribute('max')) || 99;
+                    let value = parseInt(this.value) || 0;
+                    
+                    if (value < 0) value = 0;
+                    if (value > max) value = max;
+                    
+                    this.value = value;
+                    
+                    const checkbox = this.closest('.ticket-option').querySelector('.ticket-checkbox');
+                    if (value > 0 && !checkbox.checked) {
+                        // If quantity is set but checkbox isn't checked, check it
+                        checkbox.checked = true;
+                        const quantityDiv = this.closest('.ticket-option').querySelector('.ticket-quantity');
+                        quantityDiv.style.display = 'block';
+                        quantityDiv.classList.add('visible');
+                    } else if (value === 0 && checkbox.checked) {
+                        // If quantity is 0 but checkbox is checked, uncheck it
+                        checkbox.checked = false;
+                        const quantityDiv = this.closest('.ticket-option').querySelector('.ticket-quantity');
+                        quantityDiv.classList.remove('visible');
+                        setTimeout(() => {
+                            quantityDiv.style.display = 'none';
+                        }, 300);
+                    }
+                    
+                    // Update the ticket option styling
+                    const ticketOption = this.closest('.ticket-option');
+                    if (value > 0) {
+                        ticketOption.style.background = 'rgba(46, 204, 113, 0.1)';
+                        ticketOption.style.boxShadow = '0 4px 10px rgba(46, 204, 113, 0.15)';
+                        ticketOption.style.transform = 'translateY(-2px)';
+                    } else {
+                        ticketOption.style.background = 'rgba(46, 204, 113, 0.05)';
+                        ticketOption.style.boxShadow = 'none';
+                        ticketOption.style.transform = 'translateY(0)';
+                    }
+                    
+                    updateTotalPrice();
+                });
+                
+                // Add input event listener for real-time updates while typing
+                input.addEventListener('input', function() {
+                    const value = parseInt(this.value) || 0;
+                    const max = parseInt(this.getAttribute('max')) || 99;
+                    
+                    // Make sure we don't exceed max value even while typing
+                    if (value > max) {
+                        this.value = max;
+                    }
+                    
+                    // Update checkbox status based on input value
+                    const checkbox = this.closest('.ticket-option').querySelector('.ticket-checkbox');
+                    checkbox.checked = value > 0;
+                    
+                    // Update total immediately without animation for smoother experience
+                    updateTotalPrice(false);
+                });
+            });
+            
+            // Display quantity controls when checkbox is checked
+            ticketCheckboxes.forEach(checkbox => {
+                const ticketOption = checkbox.closest('.ticket-option');
+                const quantityDiv = ticketOption.querySelector('.ticket-quantity');
+                
+                if (checkbox.checked) {
+                    quantityDiv.style.display = 'block';
+                }
+            });
+            
+            // Form validation before submission
+            if (ticketForm) {
+                ticketForm.addEventListener('submit', function(e) {
+                    let hasSelectedTickets = false;
+                    
+                    ticketCheckboxes.forEach(checkbox => {
+                        if (checkbox.checked) {
+                            hasSelectedTickets = true;
+                        }
+                    });
+                    
+                    if (!hasSelectedTickets) {
+                        e.preventDefault();
+                        alert('Please select at least one ticket to proceed.');
+                    }
+                });
+            }
+            
+            // Calculate total price with animation
+            function updateTotalPrice(animate = true) {
+                let total = 0;
+                let totalTickets = 0;
+                
+                ticketCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        const price = parseFloat(checkbox.dataset.price) || 0;
+                        const qtyInput = checkbox.closest('.ticket-option').querySelector('.qty-input');
+                        const quantity = parseInt(qtyInput.value) || 0;
+                        
+                        total += price * quantity;
+                        totalTickets += quantity;
+                    }
+                });
+                
+                // Get book now button to update it
+                const bookButton = document.querySelector('.btn-book');
+                
+                // Update button text with ticket count
+                if (bookButton) {
+                    if (totalTickets > 0) {
+                        bookButton.innerHTML = `<i class="fas fa-shopping-cart me-2"></i> Book ${totalTickets} Ticket${totalTickets > 1 ? 's' : ''}`;
+                        bookButton.disabled = false;
+                    } else {
+                        bookButton.innerHTML = `<i class="fas fa-shopping-cart me-2"></i> Book Now`;
+                        bookButton.disabled = true;
+                    }
+                }
+                
+                // Create a prominent display for individual ticket prices and total calculation
+                updateDetailedPriceBreakdown(total);
+                
+                if (animate) {
+                    // Animate the price change
+                    const currentPrice = parseFloat(totalPriceElement.textContent.replace('$', '')) || 0;
+                    const duration = 300;
+                    const start = performance.now();
+                    
+                    function animatePrice(currentTime) {
+                        const elapsed = currentTime - start;
+                        const progress = Math.min(elapsed / duration, 1);
+                        
+                        const currentTotal = currentPrice + (total - currentPrice) * progress;
+                        totalPriceElement.textContent = '$' + currentTotal.toFixed(2);
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(animatePrice);
+                        }
+                    }
+                    
+                    requestAnimationFrame(animatePrice);
+                } else {
+                    // Update immediately without animation
+                    totalPriceElement.textContent = '$' + total.toFixed(2);
+                }
+                
+                // Highlight the total price element when it changes
+                totalPriceElement.parentElement.classList.add('pulse');
+                setTimeout(() => {
+                    totalPriceElement.parentElement.classList.remove('pulse');
+                }, 300);
+            }
+            
+            // Create a new function to update a detailed price breakdown
+            function updateDetailedPriceBreakdown(total) {
+                // Check if price breakdown container exists, if not create it
+                let priceBreakdownContainer = document.getElementById('priceBreakdown');
+                if (!priceBreakdownContainer) {
+                    priceBreakdownContainer = document.createElement('div');
+                    priceBreakdownContainer.id = 'priceBreakdown';
+                    priceBreakdownContainer.className = 'price-breakdown mt-3 mb-3 p-3 rounded';
+                    
+                    // Insert it before the total price/book now button
+                    const totalPriceContainer = document.querySelector('.total-price').parentElement;
+                    totalPriceContainer.parentElement.insertBefore(priceBreakdownContainer, totalPriceContainer);
+                }
+                
+                // Clear previous content
+                priceBreakdownContainer.innerHTML = '';
+                
+                // Add title if there are selected tickets
+                let hasSelectedTickets = false;
+                
+                // Create breakdown HTML
+                let breakdownHTML = '';
+                
+                ticketCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        hasSelectedTickets = true;
+                        const ticketOption = checkbox.closest('.ticket-option');
+                        const ticketName = ticketOption.querySelector('.form-check-label strong').textContent;
+                        const price = parseFloat(checkbox.dataset.price) || 0;
+                        const qtyInput = ticketOption.querySelector('.qty-input');
+                        const quantity = parseInt(qtyInput.value) || 0;
+                        const itemTotal = price * quantity;
+                        
+                        if (quantity > 0) {
+                            breakdownHTML += `
+                                <div class="d-flex justify-content-between align-items-center mb-2 small">
+                                    <div>
+                                        <span class="fw-medium">${ticketName}</span>
+                                        <span class="text-muted ms-2">($${price.toFixed(2)} x ${quantity})</span>
+                                    </div>
+                                    <span class="ms-2 fw-medium">$${itemTotal.toFixed(2)}</span>
+                                </div>
+                            `;
+                        }
+                    }
+                });
+                
+                // Only show breakdown if tickets are selected
+                if (hasSelectedTickets) {
+                    priceBreakdownContainer.innerHTML = `
+                        <div class="text-muted small mb-2 d-flex align-items-center">
+                            <i class="fas fa-receipt me-2"></i>
+                            Price Breakdown
+                        </div>
+                        ${breakdownHTML}
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                            <span class="fw-bold">Total Amount</span>
+                            <span class="fw-bold fs-5 text-success">$${total.toFixed(2)}</span>
+                        </div>
+                    `;
+                    
+                    // Add animation when shown
+                    priceBreakdownContainer.style.display = 'block';
+                    priceBreakdownContainer.classList.add('pulse');
+                    setTimeout(() => {
+                        priceBreakdownContainer.classList.remove('pulse');
+                    }, 500);
+                } else {
+                    priceBreakdownContainer.style.display = 'none';
+                }
+            }
+        });
+    </script>
+{% endblock %} 

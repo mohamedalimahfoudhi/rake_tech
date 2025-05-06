@@ -1,0 +1,191 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RackeTech - Login{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/styles/auth.css') }}">
+    <style>
+        /* Logo styling for login page */
+        .login-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .login-logo:hover {
+            transform: scale(1.1);
+        }
+        
+        .login-logo:hover .logo-racket {
+            animation: spin 1s ease;
+        }
+        
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .logo-racket {
+            font-size: 2.5rem;
+            margin-right: 10px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+        
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .toggle-panel h1 {
+            margin-bottom: 10px;
+        }
+        
+        .toggle-panel .login-logo {
+            margin-bottom: 30px;
+        }
+        
+        .toggle-panel .logo-text {
+            color: white;
+            -webkit-text-fill-color: white;
+            background: none;
+            animation: none;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container" data-controller="auth">
+        <div class="form-box login">
+            <form action="{{ path('app_login') }}" method="post">
+                <div class="login-logo">
+                    <span class="logo-racket">🎾</span>
+                    <span class="logo-text">RackeTech</span>
+                </div>
+                <h1>Login</h1>
+        
+        {% if error %}
+                    <div class="alert alert-danger">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+        {% endif %}
+
+                <div class="input-box">
+                    <input type="text" name="_username" value="{{ last_username }}" placeholder="Email" required>
+                    <i class='bx bxs-user'></i>
+            </div>
+                <div class="input-box">
+                    <input type="password" name="_password" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt' ></i>
+            </div>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <div class="forgot-link">
+                    <a href="#">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <p>or login with social platforms</p>
+                <div class="social-icons">
+                    <a href="#"><i class='bx bxl-google' ></i></a>
+                    <a href="#"><i class='bx bxl-facebook' ></i></a>
+                    <a href="#"><i class='bx bxl-github' ></i></a>
+                    <a href="#"><i class='bx bxl-linkedin' ></i></a>
+                </div>
+            </form>
+        </div>
+
+        <div class="form-box register">
+            <form action="#">
+                <div class="login-logo">
+                    <span class="logo-racket">🎾</span>
+                    <span class="logo-text">RackeTech</span>
+                </div>
+                <h1>Registration</h1>
+                <div class="input-box">
+                    <input type="text" placeholder="Username" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box">
+                    <input type="email" placeholder="Email" required>
+                    <i class='bx bxs-envelope' ></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt' ></i>
+                </div>
+                <button type="submit" class="btn">Register</button>
+                <p>or register with social platforms</p>
+                <div class="social-icons">
+                    <a href="#"><i class='bx bxl-google' ></i></a>
+                    <a href="#"><i class='bx bxl-facebook' ></i></a>
+                    <a href="#"><i class='bx bxl-github' ></i></a>
+                    <a href="#"><i class='bx bxl-linkedin' ></i></a>
+                </div>
+            </form>
+        </div>
+
+        <div class="toggle-box">
+            <div class="toggle-panel toggle-left">
+                <div class="login-logo">
+                    <span class="logo-racket">🎾</span>
+                    <span class="logo-text">RackeTech</span>
+                </div>
+                <h1>Hello, Welcome!</h1>
+                <p>Don't have an account?</p>
+                <button class="btn register-btn">Register</button>
+            </div>
+
+            <div class="toggle-panel toggle-right">
+                <div class="login-logo">
+                    <span class="logo-racket">🎾</span>
+                    <span class="logo-text">RackeTech</span>
+                </div>
+                <h1>Welcome Back!</h1>
+                <p>Already have an account?</p>
+                <button class="btn login-btn">Login</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %} 

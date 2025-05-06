@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historical Exchange Rates{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .exchange-rates-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .currency-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        .currency-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .nav-pills .nav-link.active {
+            background-color: #7494ec;
+        }
+        .nav-pills .nav-link {
+            color: #333;
+            border-radius: 30px;
+            padding: 8px 20px;
+            margin: 0 5px;
+        }
+        .date-picker {
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="exchange-rates-container">
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <h1 class="h2 mb-0">Historical Exchange Rates</h1>
+                <p class="text-muted">View exchange rates for a specific date</p>
+            </div>
+            <div class="col-lg-6 text-end">
+                {% if historical_rates.timestamp is defined %}
+                    <p class="mb-0">Date: {{ historical_rates.date }}</p>
+                    <p class="text-muted">Base currency: {{ historical_rates.base }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Navigation tabs -->
+        <ul class="nav nav-pills mb-4">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates') }}">Latest Rates</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates_convert') }}">Currency Converter</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ path('exchange_rates_historical') }}">Historical Data</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates_timeseries') }}">Time Series</a>
+            </li>
+        </ul>
+
+        <!-- Error message display -->
+        {% if historical_rates.error is defined %}
+            <div class="alert alert-danger">
+                <p class="mb-0">Error: {{ historical_rates.error }}</p>
+            </div>
+        {% endif %}
+
+        <!-- Date selection form -->
+        <form action="{{ path('exchange_rates_historical') }}" method="get" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="date" class="form-label">Select Date</label>
+                    <input type="date" class="form-control date-picker" id="date" name="date" value="{{ date }}" 
+                           max="{{ "now"|date('Y-m-d') }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="symbols" class="form-label">Currencies (comma separated)</label>
+                    <input type="text" class="form-control" id="symbols" name="symbols" 
+                           value="{{ symbols }}" placeholder="USD,EUR,GBP,JPY">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">Get Rates</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Rates display -->
+        {% if historical_rates.rates is defined %}
+            <div class="row">
+                {% for currency, rate in historical_rates.rates %}
+                    <div class="col-md-3 col-sm-6">
+                        <div class="currency-card">
+                            <h4 class="currency-code">{{ currency }}</h4>
+                            <p class="currency-rate mb-0">{{ rate }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %} 

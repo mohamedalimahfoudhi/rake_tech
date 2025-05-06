@@ -1,0 +1,71 @@
+<!-- Add New Ticket Modal -->
+<div class="modal fade" id="addTicketModal" tabindex="-1" aria-labelledby="addTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="addTicketModalLabel">Add New Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{{ path('admin_ticket_add') }}" class="needs-validation" novalidate>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="add_event" class="form-label">Event</label>
+                        <select class="form-select" id="add_event" name="eventID" required>
+                            <option value="" disabled selected>Select event...</option>
+                            {% for event in events %}
+                                <option value="{{ event.ID }}">{{ event.nom }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select an event.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add_type" class="form-label">Ticket Type</label>
+                        <select class="form-select" id="add_type" name="typeBillet" required>
+                            <option value="" disabled selected>Select type...</option>
+                            <option value="Gradin">Gradin</option>
+                            <option value="Virage">Virage</option>
+                            <option value="VIP">VIP</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a ticket type.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add_price" class="form-label">Price</label>
+                        <div class="input-group has-validation">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="add_price" name="prix" value="15.00" min="0" step="0.01" required>
+                            <div class="invalid-feedback">
+                                Please enter a valid price (minimum $0).
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add_quantity" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="add_quantity" name="quantite" value="100" min="1" required>
+                        <div class="invalid-feedback">
+                            Please enter a valid quantity (minimum 1).
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add_status" class="form-label">Status</label>
+                        <select class="form-select" id="add_status" name="statut" required>
+                            <option value="Valide" selected>Valide</option>
+                            <option value="Annulé">Annulé</option>
+                            <option value="Non valide">Non valide</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a status.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Tickets</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

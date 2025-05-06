@@ -1,0 +1,87 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Users Management</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="input-group me-2">
+                <input type="text" class="form-control" placeholder="Search users...">
+                <button class="btn btn-outline-secondary" type="button">Search</button>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-success">
+                <i class="fas fa-plus me-1"></i> Add New User
+            </button>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-users me-1"></i>
+            Users List
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.ID }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.prenom }} {{ user.nom }}</td>
+                                <td>{{ user.numeroTelephone }}</td>
+                                <td>
+                                    {% if user.role %}
+                                        <span class="badge bg-{% if user.role.roleNom == 'ADMIN' %}danger{% else %}info{% endif %}">
+                                            {{ user.role.roleNom }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No Role</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="#" class="btn btn-sm btn-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">No users found</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endblock %} 

@@ -1,0 +1,79 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_content %}
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-qrcode me-2"></i>QR Code du Billet
+                        </h4>
+                    </div>
+                    <div class="card-body text-center py-5">
+                        <h5 class="card-title mb-4">Billet #{{ ticket.id }}</h5>
+                        <p class="mb-3">
+                            <strong>Code:</strong> <code>{{ ticket.codeUnique }}</code>
+                        </p>
+                        
+                        <div class="mb-4">
+                            <img src="{{ qr_code_url }}" alt="QR Code du billet" class="img-fluid border p-2" style="max-width: 250px;">
+                        </div>
+                        
+                        <table class="table table-striped table-bordered mt-4">
+                            <tbody>
+                                <tr>
+                                    <th width="30%">Événement</th>
+                                    <td>
+                                        {% if ticket.evenement %}
+                                            {{ ticket.evenement.nom }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Type</th>
+                                    <td>{{ ticket.typeBillet }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Prix</th>
+                                    <td>${{ ticket.prix }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Statut</th>
+                                    <td>
+                                        {% if ticket.statut == 'Valide' %}
+                                            <span class="badge bg-success">Valide</span>
+                                        {% elseif ticket.statut == 'Annulé' %}
+                                            <span class="badge bg-danger">Annulé</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Non valide</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="mt-4">
+                            <p class="text-muted small">
+                                Ce QR code contient l'identifiant unique de ce billet.
+                                Il peut être scanné pour valider le billet.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('admin_tickets') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Retour aux Billets
+                            </a>
+                            <a href="#" class="btn btn-success" onclick="window.print()">
+                                <i class="fas fa-print me-2"></i>Imprimer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

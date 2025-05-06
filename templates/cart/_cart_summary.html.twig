@@ -1,0 +1,18 @@
+{% set cart = app.session.get('cart', []) %}
+{% set cart_count = 0 %}
+{% set cart_total = 0 %}
+
+{% for item in cart %}
+    {% set cart_count = cart_count + item.quantity %}
+    {% set cart_total = cart_total + (item.price * item.quantity) %}
+{% endfor %}
+
+<div class="cart-summary">
+    <div class="d-flex align-items-center">
+        <a href="{{ path('cart_index') }}" class="text-decoration-none">
+            <i class="fas fa-shopping-cart me-2"></i>
+            <span class="badge bg-warning text-dark">{{ cart_count }}</span>
+            <span class="d-none d-md-inline ms-2">{{ cart_total|number_format(2) }} €</span>
+        </a>
+    </div>
+</div> 

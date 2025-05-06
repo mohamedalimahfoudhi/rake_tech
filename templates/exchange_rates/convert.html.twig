@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Currency Converter{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .exchange-rates-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .conversion-result {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .result-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #7494ec;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #7494ec;
+        }
+        .nav-pills .nav-link {
+            color: #333;
+            border-radius: 30px;
+            padding: 8px 20px;
+            margin: 0 5px;
+        }
+        .swap-icon {
+            font-size: 1.5rem;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .swap-icon:hover {
+            background: #e9ecef;
+            transform: rotate(180deg);
+        }
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .back-button i {
+            margin-right: 8px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <a href="{{ path('app_dashboard') }}" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    
+    <div class="exchange-rates-container">
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <h1 class="h2 mb-0">Currency Converter</h1>
+                <p class="text-muted">Convert between currencies in real-time</p>
+            </div>
+            <div class="col-lg-6 text-end">
+                {% if conversion.date is defined %}
+                    <p class="mb-0">Date: {{ conversion.date }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Navigation tabs -->
+        <ul class="nav nav-pills mb-4">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates') }}">Latest Rates</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ path('exchange_rates_convert') }}">Currency Converter</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates_historical') }}">Historical Data</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates_timeseries') }}">Time Series</a>
+            </li>
+        </ul>
+
+        <!-- Error message display -->
+        {% if conversion.error is defined %}
+            <div class="alert alert-danger">
+                <p class="mb-0">Error: {{ conversion.error }}</p>
+            </div>
+        {% endif %}
+
+        <!-- Conversion form -->
+        <form action="{{ path('exchange_rates_convert') }}" method="get" class="mt-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="amount" class="form-label">Amount</label>
+                    <input type="number" class="form-control" id="amount" name="amount" value="{{ amount }}" step="0.01" min="0.01" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="from" class="form-label">From</label>
+                    <select class="form-select" id="from" name="from" required>
+                        {% if symbols is iterable %}
+                            {% for code, name in symbols %}
+                                <option value="{{ code }}" {% if code == from %}selected{% endif %}>{{ code }} - {{ name }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="EUR" {% if from == 'EUR' %}selected{% endif %}>EUR - Euro</option>
+                            <option value="USD" {% if from == 'USD' %}selected{% endif %}>USD - US Dollar</option>
+                            <option value="GBP" {% if from == 'GBP' %}selected{% endif %}>GBP - British Pound</option>
+                            <option value="JPY" {% if from == 'JPY' %}selected{% endif %}>JPY - Japanese Yen</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-md-1 text-center">
+                    <div class="swap-icon" id="swapCurrencies">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="to" class="form-label">To</label>
+                    <select class="form-select" id="to" name="to" required>
+                        {% if symbols is iterable %}
+                            {% for code, name in symbols %}
+                                <option value="{{ code }}" {% if code == to %}selected{% endif %}>{{ code }} - {{ name }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="EUR" {% if to == 'EUR' %}selected{% endif %}>EUR - Euro</option>
+                            <option value="USD" {% if to == 'USD' %}selected{% endif %}>USD - US Dollar</option>
+                            <option value="GBP" {% if to == 'GBP' %}selected{% endif %}>GBP - British Pound</option>
+                            <option value="JPY" {% if to == 'JPY' %}selected{% endif %}>JPY - Japanese Yen</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Convert</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Conversion result -->
+        {% if conversion.result is defined %}
+            <div class="conversion-result">
+                <p class="mb-2">{{ amount }} {{ from }} equals</p>
+                <p class="result-amount">{{ conversion.result|number_format(2, '.', ',') }} {{ to }}</p>
+                <p class="text-muted">1 {{ from }} = {{ (conversion.result / amount)|number_format(6, '.', ',') }} {{ to }}</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const swapButton = document.getElementById('swapCurrencies');
+            const fromSelect = document.getElementById('from');
+            const toSelect = document.getElementById('to');
+            
+            swapButton.addEventListener('click', function() {
+                const fromValue = fromSelect.value;
+                const toValue = toSelect.value;
+                
+                fromSelect.value = toValue;
+                toSelect.value = fromValue;
+            });
+        });
+    </script>
+{% endblock %} 

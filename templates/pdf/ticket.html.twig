@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>E-Ticket - {{ evenement.nom }}</title>
+    <style>
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            color: #333333;
+        }
+        .ticket-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #cccccc;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .ticket-header {
+            background-color: #4e73df;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .ticket-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .ticket-subtitle {
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        .ticket-body {
+            padding: 20px;
+        }
+        .ticket-event-details {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .ticket-event-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4e73df;
+            margin-bottom: 10px;
+        }
+        .ticket-type {
+            display: inline-block;
+            background-color: #4e73df;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .ticket-details-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 30px;
+            border-collapse: collapse;
+        }
+        .ticket-detail-row {
+            display: table-row;
+        }
+        .ticket-detail-label {
+            display: table-cell;
+            width: 40%;
+            padding: 8px 10px;
+            border-bottom: 1px solid #eeeeee;
+            color: #777777;
+            font-weight: bold;
+        }
+        .ticket-detail-value {
+            display: table-cell;
+            width: 60%;
+            padding: 8px 10px;
+            border-bottom: 1px solid #eeeeee;
+            font-weight: normal;
+        }
+        .qr-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .qr-code {
+            padding: 10px;
+            background-color: #f8f9fc;
+            display: inline-block;
+            border: 1px solid #e3e6f0;
+        }
+        .ticket-code {
+            text-align: center;
+            font-family: monospace;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+        .ticket-footer {
+            background-color: #f8f9fc;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #777777;
+            border-top: 1px solid #e3e6f0;
+        }
+        .important-note {
+            font-size: 14px;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket-container">
+        <div class="ticket-header">
+            <h1 class="ticket-title">E-TICKET</h1>
+            <div class="ticket-subtitle">This is your official electronic ticket</div>
+        </div>
+        
+        <div class="ticket-body">
+            <div class="ticket-event-details">
+                <div class="ticket-event-name">{{ evenement.nom }}</div>
+                <div class="ticket-type">{{ billet.typeBillet }}</div>
+                <div>
+                    <strong>Date:</strong> {{ evenement.dateDebut|date('d M Y') }} at {{ evenement.dateDebut|date('H:i') }}
+                </div>
+                <div>
+                    <strong>Location:</strong> {{ evenement.type }}
+                </div>
+            </div>
+            
+            <div class="ticket-details-grid">
+                <div class="ticket-detail-row">
+                    <div class="ticket-detail-label">Ticket Reference:</div>
+                    <div class="ticket-detail-value">{{ reservation.id }}</div>
+                </div>
+                <div class="ticket-detail-row">
+                    <div class="ticket-detail-label">Attendee:</div>
+                    <div class="ticket-detail-value">{{ user.prenom }} {{ user.nom }}</div>
+                </div>
+                <div class="ticket-detail-row">
+                    <div class="ticket-detail-label">Quantity:</div>
+                    <div class="ticket-detail-value">{{ quantite }}</div>
+                </div>
+                <div class="ticket-detail-row">
+                    <div class="ticket-detail-label">Price:</div>
+                    <div class="ticket-detail-value">${{ billet.prix * quantite }}</div>
+                </div>
+                <div class="ticket-detail-row">
+                    <div class="ticket-detail-label">Event Type:</div>
+                    <div class="ticket-detail-value">{{ evenement.type }}</div>
+                </div>
+                <div class="ticket-detail-row">
+                    <div class="ticket-detail-label">Status:</div>
+                    <div class="ticket-detail-value">{{ billet.statut }}</div>
+                </div>
+            </div>
+            
+            <div class="qr-section">
+                <div class="qr-code">
+                    <img src="{{ qrCodeUrl }}" alt="Ticket QR Code">
+                </div>
+                <div class="ticket-code">{{ uniqueCode }}</div>
+            </div>
+            
+            <div class="important-note">
+                <strong>Important:</strong> Please present this ticket at the venue for entry. 
+                The QR code will be scanned at entry point for verification.
+            </div>
+        </div>
+        
+        <div class="ticket-footer">
+            <p>This ticket was issued on {{ "now"|date('d/m/Y H:i') }}</p>
+            <p>For any questions or issues, please contact event organizers.</p>
+        </div>
+    </div>
+</body>
+</html> 

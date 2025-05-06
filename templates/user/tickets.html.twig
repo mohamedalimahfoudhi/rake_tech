@@ -1,0 +1,443 @@
+{% extends 'user/layout.html.twig' %}
+
+{% block user_content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+        <h1 class="h2">My Tickets</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ path('user_events') }}" class="btn btn-primary">
+                <i class="fas fa-calendar-alt me-1"></i> Browse Events
+            </a>
+        </div>
+    </div>
+
+    <!-- Ticket Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-4 mb-md-0">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Total Tickets</h6>
+                            <h3>{{ reservations|length }}</h3>
+                        </div>
+                        <i class="fas fa-ticket-alt fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 mb-md-0">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Upcoming Events</h6>
+                            <h3>{{ reservations|filter(r => r.evenement.dateDebut > "now"|date('Y-m-d'))|length }}</h3>
+                        </div>
+                        <i class="fas fa-calendar-check fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 mb-md-0">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">This Month</h6>
+                            <h3>{{ reservations|filter(r => r.evenement.dateDebut > "now"|date('Y-m-d') and r.evenement.dateDebut < "now"|date_modify("+1 month")|date('Y-m-d'))|length }}</h3>
+                        </div>
+                        <i class="fas fa-calendar-day fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Past Events</h6>
+                            <h3>{{ reservations|filter(r => r.evenement.dateDebut < "now"|date('Y-m-d'))|length }}</h3>
+                        </div>
+                        <i class="fas fa-history fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tickets List -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-ticket-alt me-1"></i>
+            My Tickets
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs mb-3" id="ticketTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true">Upcoming</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab" aria-controls="past" aria-selected="false">Past</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="false">All Tickets</button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="ticketTabsContent">
+                <!-- Upcoming Tickets -->
+                <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+                    {% set upcomingReservations = reservations|filter(r => r.evenement.dateDebut > "now"|date('Y-m-d')) %}
+                    {% if upcomingReservations|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Ticket Type</th>
+                                        <th>Quantity</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reservation in upcomingReservations %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ path('event_details', {'id': reservation.evenement.id}) }}" class="text-decoration-none fw-bold">
+                                                    {{ reservation.evenement.nom }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                                    <span>{{ reservation.evenement.dateDebut|date('d M Y') }}</span>
+                                                </div>
+                                                <small class="text-muted">{{ reservation.evenement.dateDebut|date('H:i') }}</small>
+                                            </td>
+                                            <td>{{ reservation.evenement.type }}</td>
+                                            <td>{{ reservation.billet.typeBillet }}</td>
+                                            <td>{{ reservation.quantite }}</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#ticketModal{{ reservation.reservation.id }}">
+                                                        <i class="fas fa-qrcode me-1"></i> View
+                                                    </button>
+                                                    <a href="{{ path('ticket_pdf_download', {'reservationId': reservation.reservation.id}) }}" class="btn btn-sm btn-outline-success">
+                                                        <i class="fas fa-download me-1"></i> Download
+                                                    </a>
+                                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#refundModal{{ reservation.reservation.id }}">
+                                                        <i class="fas fa-undo-alt me-1"></i> Refund
+                                                    </button>
+                                                </div>
+                                                
+                                                <!-- Refund Modal -->
+                                                <div class="modal fade" id="refundModal{{ reservation.reservation.id }}" tabindex="-1" aria-labelledby="refundModalLabel{{ reservation.reservation.id }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-danger text-white">
+                                                                <h5 class="modal-title" id="refundModalLabel{{ reservation.reservation.id }}">
+                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                    Confirm Ticket Refund
+                                                                </h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="alert alert-warning">
+                                                                    <p><strong>Are you sure you want to request a refund?</strong></p>
+                                                                    <p>This action cannot be undone. Once refunded, you will lose your reservation for this event.</p>
+                                                                </div>
+                                                                
+                                                                <div class="ticket-details mb-3">
+                                                                    <h6 class="border-bottom pb-2 mb-3">Ticket Details</h6>
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-5 text-muted">Event:</div>
+                                                                        <div class="col-7"><strong>{{ reservation.evenement.nom }}</strong></div>
+                                                                    </div>
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-5 text-muted">Date:</div>
+                                                                        <div class="col-7">{{ reservation.evenement.dateDebut|date('d M Y') }} at {{ reservation.evenement.dateDebut|date('H:i') }}</div>
+                                                                    </div>
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-5 text-muted">Ticket Type:</div>
+                                                                        <div class="col-7">{{ reservation.billet.typeBillet }}</div>
+                                                                    </div>
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-5 text-muted">Quantity:</div>
+                                                                        <div class="col-7">{{ reservation.quantite }}</div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-5 text-muted">Amount to refund:</div>
+                                                                        <div class="col-7"><strong>${{ reservation.billet.prix * reservation.quantite }}</strong></div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="refund-policy">
+                                                                    <h6 class="border-bottom pb-2 mb-3">Refund Policy</h6>
+                                                                    <p class="small">Refunds are processed within 5-7 business days. The amount will be returned to your original payment method. Processing times may vary depending on your bank or payment provider.</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                <form action="{{ path('user_refund_ticket', {'id': reservation.reservation.id}) }}" method="POST" class="d-inline">
+                                                                    <div class="form-check mb-3 text-start">
+                                                                        <input class="form-check-input" type="checkbox" id="deleteTicket{{ reservation.reservation.id }}" name="delete_ticket" value="1">
+                                                                        <label class="form-check-label" for="deleteTicket{{ reservation.reservation.id }}">
+                                                                            Completely remove this ticket from my history
+                                                                        </label>
+                                                                    </div>
+                                                                    <button type="submit" class="btn btn-danger">
+                                                                        <i class="fas fa-undo-alt me-1"></i> Confirm Refund
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Ticket Modal -->
+                                                <div class="modal fade" id="ticketModal{{ reservation.reservation.id }}" tabindex="-1" aria-labelledby="ticketModalLabel{{ reservation.reservation.id }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-primary text-white">
+                                                                <h5 class="modal-title" id="ticketModalLabel{{ reservation.reservation.id }}">
+                                                                    <i class="fas fa-ticket-alt me-2"></i>
+                                                                    E-Ticket
+                                                                </h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="text-center mb-4">
+                                                                    <h4>{{ reservation.evenement.nom }}</h4>
+                                                                    <div class="badge bg-primary mb-2">{{ reservation.billet.typeBillet }}</div>
+                                                                    <p class="mb-0">
+                                                                        <i class="fas fa-calendar-alt me-2"></i>
+                                                                        {{ reservation.evenement.dateDebut|date('d M Y') }} at {{ reservation.evenement.dateDebut|date('H:i') }}
+                                                                    </p>
+                                                                    <p>
+                                                                        <i class="fas fa-map-marker-alt me-2"></i>
+                                                                        {{ reservation.evenement.type }}
+                                                                    </p>
+                                                                </div>
+                                                                
+                                                                <div class="text-center mb-3">
+                                                                    <div class="qr-code bg-light p-3 d-inline-block">
+                                                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Reservation{{ reservation.reservation.id }}" alt="QR Code">
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="ticket-details">
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-6 text-muted">Ticket ID:</div>
+                                                                        <div class="col-6 text-end">{{ reservation.reservation.id }}</div>
+                                                                    </div>
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-6 text-muted">Attendee:</div>
+                                                                        <div class="col-6 text-end">{{ app.user.prenom }} {{ app.user.nom }}</div>
+                                                                    </div>
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-6 text-muted">Quantity:</div>
+                                                                        <div class="col-6 text-end">{{ reservation.quantite }}</div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-6 text-muted">Price:</div>
+                                                                        <div class="col-6 text-end">${{ reservation.billet.prix * reservation.quantite }}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                <a href="{{ path('ticket_pdf_download', {'reservationId': reservation.reservation.id}) }}" class="btn btn-success" target="_blank">
+                                                                    <i class="fas fa-download me-1"></i> Download Ticket
+                                                                </a>
+                                                                <button type="button" class="btn btn-info print-ticket" data-reservation-id="{{ reservation.reservation.id }}">
+                                                                    <i class="fas fa-print me-1"></i> Print Ticket
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            You don't have any upcoming tickets. <a href="{{ path('user_events') }}">Browse events</a> to book tickets!
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Past Tickets -->
+                <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+                    {% set pastReservations = reservations|filter(r => r.evenement.dateDebut < "now"|date('Y-m-d')) %}
+                    {% if pastReservations|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Ticket Type</th>
+                                        <th>Quantity</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reservation in pastReservations %}
+                                        <tr class="table-light">
+                                            <td>
+                                                <a href="{{ path('event_details', {'id': reservation.evenement.id}) }}" class="text-decoration-none fw-bold">
+                                                    {{ reservation.evenement.nom }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-calendar-alt text-secondary me-2"></i>
+                                                    <span>{{ reservation.evenement.dateDebut|date('d M Y') }}</span>
+                                                </div>
+                                                <small class="text-muted">{{ reservation.evenement.dateDebut|date('H:i') }}</small>
+                                            </td>
+                                            <td>{{ reservation.evenement.type }}</td>
+                                            <td>{{ reservation.billet.typeBillet }}</td>
+                                            <td>{{ reservation.quantite }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-secondary" disabled>
+                                                    <i class="fas fa-check-circle me-1"></i> Attended
+                                                </button>
+                                                <a href="{{ path('ticket_pdf_download', {'reservationId': reservation.reservation.id}) }}" class="btn btn-sm btn-outline-success">
+                                                    <i class="fas fa-download me-1"></i> Download
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            You don't have any past ticket records.
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- All Tickets -->
+                <div class="tab-pane fade" id="all" role="tabpanel" aria-labelledby="all-tab">
+                    {% if reservations|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Ticket Type</th>
+                                        <th>Quantity</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reservation in reservations %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ path('event_details', {'id': reservation.evenement.id}) }}" class="text-decoration-none fw-bold">
+                                                    {{ reservation.evenement.nom }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                                    <span>{{ reservation.evenement.dateDebut|date('d M Y') }}</span>
+                                                </div>
+                                            </td>
+                                            <td>{{ reservation.evenement.type }}</td>
+                                            <td>{{ reservation.billet.typeBillet }}</td>
+                                            <td>{{ reservation.quantite }}</td>
+                                            <td>
+                                                {% if reservation.reservation.statut == 'Remboursé' %}
+                                                    <span class="badge bg-warning text-dark">Refunded</span>
+                                                {% elseif reservation.evenement.dateDebut > "now"|date('Y-m-d') %}
+                                                    <span class="badge bg-success">Upcoming</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Past</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if reservation.reservation.statut != 'Remboursé' %}
+                                                    <a href="{{ path('ticket_pdf_download', {'reservationId': reservation.reservation.id}) }}" class="btn btn-sm btn-outline-success">
+                                                        <i class="fas fa-download me-1"></i> Download
+                                                    </a>
+                                                    
+                                                    {% if reservation.evenement.dateDebut > "now"|date('Y-m-d') %}
+                                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#refundModal{{ reservation.reservation.id }}">
+                                                            <i class="fas fa-undo-alt me-1"></i> Refund
+                                                        </button>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="text-muted"><i class="fas fa-undo-alt me-1"></i> Refunded on {{ reservation.reservation.dateReservation|date_modify("+1 day")|date('M d, Y') }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            You haven't booked any tickets yet. <a href="{{ path('user_events') }}">Browse events</a> to find something interesting!
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- If no tickets, show recommendation -->
+    {% if reservations|length == 0 %}
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-lightbulb me-1"></i>
+                Recommended Events
+            </div>
+            <div class="card-body">
+                <p class="lead">Looking for events to attend? Check out these recommendations!</p>
+                <a href="{{ path('user_events') }}" class="btn btn-primary">
+                    <i class="fas fa-search me-1"></i>
+                    Browse All Events
+                </a>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listeners to all print buttons
+        const printButtons = document.querySelectorAll('.print-ticket');
+        printButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const reservationId = this.dataset.reservationId;
+                // Open the PDF in a new window/tab
+                const pdfUrl = "{{ path('ticket_pdf_download', {'reservationId': 'RESERVATION_ID'}) }}".replace('RESERVATION_ID', reservationId);
+                
+                // Open PDF and trigger print dialog
+                const printWindow = window.open(pdfUrl, '_blank');
+                printWindow.addEventListener('load', function() {
+                    printWindow.print();
+                });
+            });
+        });
+    });
+</script>
+{% endblock %} 

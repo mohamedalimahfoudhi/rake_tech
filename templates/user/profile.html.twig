@@ -1,0 +1,307 @@
+{% extends 'user/layout.html.twig' %}
+
+{% block user_content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+        <h1 class="h2">My Profile</h1>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-md-4">
+            <!-- Profile Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-user-circle me-2"></i>
+                    Profile Information
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        {% if app.user.photoProfil %}
+                            <img src="{{ asset('uploads/profile-pictures/' ~ app.user.photoProfil) }}" class="rounded-circle img-thumbnail" alt="Profile Image">
+                        {% else %}
+                            <img src="https://via.placeholder.com/150" class="rounded-circle img-thumbnail" alt="Profile Image">
+                        {% endif %}
+                    </div>
+                    <h5 class="card-title">{{ app.user.prenom }} {{ app.user.nom }}</h5>
+                    <p class="card-text text-muted">{{ app.user.email }}</p>
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changeProfilePicModal">
+                        <i class="fas fa-camera me-1"></i>
+                        Change Picture
+                    </button>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <span><i class="fas fa-ticket-alt text-success me-2"></i> Tickets Purchased:</span>
+                            <span class="badge bg-success rounded-pill">5</span>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <span><i class="fas fa-calendar-alt text-primary me-2"></i> Events Created:</span>
+                            <span class="badge bg-primary rounded-pill">2</span>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <span><i class="fas fa-star text-warning me-2"></i> Account Status:</span>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                    </li>
+                </ul>
+                <div class="card-body">
+                    <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                        <i class="fas fa-trash-alt me-2"></i>
+                        Delete Account
+                    </button>
+                </div>
+            </div>
+
+            <!-- Account Security -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    Account Security
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                            <i class="fas fa-key me-2"></i>
+                            Change Password
+                        </button>
+                        <button class="btn btn-outline-secondary">
+                            <i class="fas fa-lock me-2"></i>
+                            Two-Factor Authentication
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <!-- Edit Profile Form -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-user-edit me-2"></i>
+                    Edit Profile
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ path('user_profile') }}">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" value="{{ app.user.prenom }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" value="{{ app.user.nom }}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ app.user.email }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ app.user.numeroTelephone|default('') }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="3">{{ app.user.adresse|default('') }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="3">{{ app.user.bio|default('') }}</textarea>
+                            <div class="form-text">Tell us a little about yourself.</div>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Communication Preferences -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-envelope me-2"></i>
+                    Communication Preferences
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ path('user_profile') }}">
+                        <input type="hidden" name="form_type" value="preferences">
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="emailNotifications" name="emailNotifications" checked>
+                                <label class="form-check-label" for="emailNotifications">
+                                    Email Notifications
+                                </label>
+                                <div class="form-text">Receive notifications about your events and tickets via email.</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="smsNotifications" name="smsNotifications">
+                                <label class="form-check-label" for="smsNotifications">
+                                    SMS Notifications
+                                </label>
+                                <div class="form-text">Receive notifications about your events and tickets via SMS.</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="marketingEmails" name="marketingEmails" checked>
+                                <label class="form-check-label" for="marketingEmails">
+                                    Marketing Emails
+                                </label>
+                                <div class="form-text">Receive marketing emails about upcoming events and promotions.</div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-info text-white">
+                                <i class="fas fa-save me-1"></i>
+                                Save Preferences
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title" id="changePasswordModalLabel">
+                        <i class="fas fa-key me-2"></i>
+                        Change Password
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="changePasswordForm" method="POST" action="{{ path('user_change_password') }}">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="changePasswordForm" class="btn btn-primary">Change Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Profile Picture Modal -->
+    <div class="modal fade" id="changeProfilePicModal" tabindex="-1" aria-labelledby="changeProfilePicModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="changeProfilePicModalLabel">
+                        <i class="fas fa-camera me-2"></i>
+                        Change Profile Picture
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        {% if app.user.photoProfil %}
+                            <img src="{{ asset('uploads/profile-pictures/' ~ app.user.photoProfil) }}" class="rounded-circle img-thumbnail" alt="Current Profile Image">
+                        {% else %}
+                            <img src="https://via.placeholder.com/150" class="rounded-circle img-thumbnail" alt="Current Profile Image">
+                        {% endif %}
+                    </div>
+                    <form id="profilePhotoForm" method="POST" action="{{ path('user_upload_photo') }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="profilePicture" class="form-label">Upload New Picture</label>
+                            <input class="form-control" type="file" id="profilePicture" name="profilePicture" accept="image/*">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="profilePhotoForm" class="btn btn-primary">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Delete Account
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Warning:</strong> This action cannot be undone.
+                    </div>
+                    <p>Are you sure you want to delete your account? This will:</p>
+                    <ul>
+                        <li>Permanently remove all your personal information</li>
+                        <li>Cancel all your event reservations</li>
+                        <li>Remove you from all events you've joined</li>
+                    </ul>
+                    <form id="deleteAccountForm" method="POST" action="{{ path('user_delete_account') }}">
+                        <div class="mb-3">
+                            <label for="deleteConfirm" class="form-label">Please type "DELETE" to confirm:</label>
+                            <input type="text" class="form-control" id="deleteConfirm" name="deleteConfirm" placeholder="DELETE">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="deleteAccountForm" class="btn btn-danger" id="confirmDeleteBtn" disabled>Delete Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Delete account confirmation
+            const deleteConfirmInput = document.getElementById('deleteConfirm');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            
+            deleteConfirmInput.addEventListener('input', function() {
+                confirmDeleteBtn.disabled = this.value !== 'DELETE';
+            });
+        });
+    </script>
+{% endblock %} 

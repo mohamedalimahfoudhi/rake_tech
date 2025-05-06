@@ -1,0 +1,143 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Exchange Rates Time Series{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .exchange-rates-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .time-series-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .time-series-table th, 
+        .time-series-table td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+        .time-series-table thead th {
+            background-color: #7494ec;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        .time-series-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .time-series-table tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #7494ec;
+        }
+        .nav-pills .nav-link {
+            color: #333;
+            border-radius: 30px;
+            padding: 8px 20px;
+            margin: 0 5px;
+        }
+        .table-responsive {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="exchange-rates-container">
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <h1 class="h2 mb-0">Time Series Data</h1>
+                <p class="text-muted">View exchange rate trends over time</p>
+            </div>
+            <div class="col-lg-6 text-end">
+                {% if timeseries_data.success is defined and timeseries_data.success %}
+                    <p class="mb-0">Period: {{ start_date }} to {{ end_date }}</p>
+                    <p class="text-muted">Base currency: {{ timeseries_data.base }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Navigation tabs -->
+        <ul class="nav nav-pills mb-4">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates') }}">Latest Rates</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates_convert') }}">Currency Converter</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('exchange_rates_historical') }}">Historical Data</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ path('exchange_rates_timeseries') }}">Time Series</a>
+            </li>
+        </ul>
+
+        <!-- Error message display -->
+        {% if timeseries_data.error is defined %}
+            <div class="alert alert-danger">
+                <p class="mb-0">Error: {{ timeseries_data.error }}</p>
+            </div>
+        {% endif %}
+
+        <!-- Date range selection form -->
+        <form action="{{ path('exchange_rates_timeseries') }}" method="get" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" 
+                           value="{{ start_date }}" max="{{ "now"|date('Y-m-d') }}" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" 
+                           value="{{ end_date }}" max="{{ "now"|date('Y-m-d') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="symbols" class="form-label">Currencies (comma separated)</label>
+                    <input type="text" class="form-control" id="symbols" name="symbols" 
+                           value="{{ symbols }}" placeholder="USD,EUR,GBP,JPY">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">View Data</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Time series data display -->
+        {% if timeseries_data.rates is defined %}
+            <div class="table-responsive">
+                <table class="time-series-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            {% set firstDate = timeseries_data.rates|keys|first %}
+                            {% if firstDate is defined and timeseries_data.rates[firstDate] is defined %}
+                                {% for currency, rate in timeseries_data.rates[firstDate] %}
+                                    <th>{{ currency }}</th>
+                                {% endfor %}
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for date, rates in timeseries_data.rates %}
+                            <tr>
+                                <td>{{ date }}</td>
+                                {% for currency, rate in rates %}
+                                    <td>{{ rate }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %} 

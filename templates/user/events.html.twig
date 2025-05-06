@@ -1,0 +1,456 @@
+{% extends 'user/layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #2ecc71;
+            --secondary-dark: #27ae60;
+            --accent: #e74c3c;
+            --accent-dark: #c0392b;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --gray: #95a5a6;
+            --gray-dark: #7f8c8d;
+        }
+        
+        body {
+            background: #f5f7fa;
+            color: #34495e;
+        }
+        
+        .text-primary-gradient {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .border-primary {
+            border-color: var(--primary) !important;
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background: rgba(52, 152, 219, 0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+            padding: 12px 16px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            color: #fff;
+            font-weight: 500;
+            text-transform: none;
+            letter-spacing: normal;
+            border-radius: 6px;
+            transition: all 0.3s;
+            padding: 8px 16px;
+        }
+        
+        .btn-primary:hover, .btn-primary:focus {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            border: none;
+            color: #fff;
+            font-weight: 500;
+            text-transform: none;
+            letter-spacing: normal;
+            border-radius: 6px;
+            transition: all 0.3s;
+            padding: 8px 16px;
+        }
+        
+        .btn-secondary:hover, .btn-secondary:focus {
+            background: var(--secondary-dark);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline-primary {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-weight: 500;
+            text-transform: none;
+            letter-spacing: normal;
+            border-radius: 6px;
+            transition: all 0.3s;
+            padding: 7px 15px;
+        }
+        
+        .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.875rem;
+        }
+        
+        .form-control, .form-select {
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            color: #333;
+            border-radius: 6px;
+            padding: 8px 12px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+            color: #333;
+        }
+        
+        .form-select option {
+            background-color: #fff;
+            color: #333;
+        }
+        
+        /* Ribbon for "Today" events */
+        .ribbon {
+            width: 150px;
+            height: 150px;
+            overflow: hidden;
+            position: absolute;
+            z-index: 1;
+        }
+        .ribbon-top-right {
+            top: -10px;
+            right: -10px;
+        }
+        .ribbon-top-right::before,
+        .ribbon-top-right::after {
+            border-top-color: transparent;
+            border-right-color: transparent;
+        }
+        .ribbon-top-right::before {
+            top: 0;
+            left: 0;
+        }
+        .ribbon-top-right::after {
+            bottom: 0;
+            right: 0;
+        }
+        .ribbon-top-right span {
+            position: absolute;
+            top: 30px;
+            right: -25px;
+            transform: rotate(45deg);
+            width: 100px;
+            background: var(--accent);
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 5px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .event-card .card {
+            transition: all 0.3s ease;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .event-card .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .badge.bg-paddel {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 500;
+            font-size: 0.75rem;
+            padding: 0.35em 0.65em;
+            border-radius: 4px;
+        }
+        
+        .badge.bg-terrain {
+            background: var(--secondary);
+            color: #fff;
+            font-weight: 500;
+            font-size: 0.75rem;
+            padding: 0.35em 0.65em;
+            border-radius: 4px;
+        }
+        
+        .btn-group .btn {
+            border-radius: 6px;
+            margin: 0 2px;
+            padding: 6px 12px;
+            font-weight: 500;
+        }
+        
+        .btn-group .btn-outline-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-group .btn-outline-primary:hover,
+        .btn-group .btn-outline-primary.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        
+        .btn-group .btn-outline-warning {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .btn-group .btn-outline-warning:hover,
+        .btn-group .btn-outline-warning.active {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        
+        .btn-group .btn-outline-success {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+        
+        .btn-group .btn-outline-success:hover,
+        .btn-group .btn-outline-success.active {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+            color: #fff;
+        }
+        
+        .btn-group .btn-outline-info {
+            border-color: var(--dark);
+            color: var(--dark);
+        }
+        
+        .btn-group .btn-outline-info:hover,
+        .btn-group .btn-outline-info.active {
+            background-color: var(--dark);
+            border-color: var(--dark);
+            color: #fff;
+        }
+        
+        .pagination .page-link {
+            background-color: #fff;
+            color: var(--dark);
+            border-color: rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        
+        .pagination .page-link:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--primary);
+            z-index: 2;
+        }
+    </style>
+{% endblock %}
+
+{% block user_content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom border-primary">
+        <h1 class="h2 text-primary-gradient">Browse Events</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="input-group me-2">
+                <input type="text" class="form-control" placeholder="Search events...">
+                <button class="btn btn-outline-primary" type="button">Search</button>
+            </div>
+            <a href="{{ path('user_create_event') }}" class="btn btn-secondary">
+                <i class="fas fa-plus me-1"></i> Create Event
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-filter me-1"></i>
+            Filter Events
+        </div>
+        <div class="card-body">
+            <form class="row g-3" id="eventFilterForm" action="{{ path('user_events') }}" method="get">
+                <div class="col-md-3">
+                    <label for="eventType" class="form-label">Event Type</label>
+                    <select class="form-select" id="eventType" name="type">
+                        <option value="">All Types</option>
+                        <option value="TERRAIN" {% if typeFilter == 'TERRAIN' %}selected{% endif %}>Terrain</option>
+                        <option value="PADDEL" {% if typeFilter == 'PADDEL' %}selected{% endif %}>Paddel</option>
+                        <option value="TAKWIRA" {% if typeFilter == 'TAKWIRA' %}selected{% endif %}>Takwira</option>
+                        <option value="conference" {% if typeFilter == 'conference' %}selected{% endif %}>Conference</option>
+                        <option value="workshop" {% if typeFilter == 'workshop' %}selected{% endif %}>Workshop</option>
+                        <option value="seminar" {% if typeFilter == 'seminar' %}selected{% endif %}>Seminar</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="eventDate" class="form-label">Date Range</label>
+                    <select class="form-select" id="eventDate" name="date">
+                        <option value="">Any Date</option>
+                        <option value="today" {% if dateFilter == 'today' %}selected{% endif %}>Today</option>
+                        <option value="tomorrow" {% if dateFilter == 'tomorrow' %}selected{% endif %}>Tomorrow</option>
+                        <option value="week" {% if dateFilter == 'week' %}selected{% endif %}>This Week</option>
+                        <option value="month" {% if dateFilter == 'month' %}selected{% endif %}>This Month</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="eventPrice" class="form-label">Price Range</label>
+                    <select class="form-select" id="eventPrice" name="price">
+                        <option value="">Any Price</option>
+                        <option value="free" {% if priceFilter == 'free' %}selected{% endif %}>Free</option>
+                        <option value="under25" {% if priceFilter == 'under25' %}selected{% endif %}>Under $25</option>
+                        <option value="25to50" {% if priceFilter == '25to50' %}selected{% endif %}>$25 - $50</option>
+                        <option value="50to100" {% if priceFilter == '50to100' %}selected{% endif %}>$50 - $100</option>
+                        <option value="over100" {% if priceFilter == 'over100' %}selected{% endif %}>Over $100</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quick Filters -->
+    <div class="mb-4">
+        <div class="btn-group w-100" role="group" aria-label="Quick filters">
+            <a href="{{ path('user_events', {'filter': 'all', 'type': typeFilter}) }}" class="btn btn-outline-primary {% if filter == 'all' or filter is empty %}active{% endif %}">All Events</a>
+            <a href="{{ path('user_events', {'filter': 'today', 'type': typeFilter}) }}" class="btn btn-outline-warning {% if filter == 'today' %}active{% endif %}">Today</a>
+            <a href="{{ path('user_events', {'filter': 'upcoming', 'type': typeFilter}) }}" class="btn btn-outline-success {% if filter == 'upcoming' %}active{% endif %}">Upcoming</a>
+            <a href="{{ path('user_events', {'filter': 'weekend', 'type': typeFilter}) }}" class="btn btn-outline-info {% if filter == 'weekend' %}active{% endif %}">This Weekend</a>
+        </div>
+    </div>
+
+    <!-- Events List -->
+    <div class="row mb-4" id="eventsList">
+        {% if events|length > 0 %}
+            {% for event in events %}
+                <div class="col-md-4 mb-4 event-card" 
+                     data-date="{{ event.dateDebut|date('Y-m-d') }}" 
+                     data-type="{{ event.type }}" 
+                     data-day-of-week="{{ event.dateDebut|date('w') }}">
+                    <div class="card h-100">
+                        {% if (event.dateDebut|date('Y-m-d')) == ('now'|date('Y-m-d')) %}
+                            <div class="ribbon ribbon-top-right"><span>Today</span></div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge {% if event.type == 'TERRAIN' %}bg-terrain{% elseif event.type == 'PADDEL' %}bg-paddel{% elseif event.type == 'TAKWIRA' %}bg-danger{% elseif event.type == 'conference' %}bg-info{% elseif event.type == 'workshop' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                    {{ event.type }}
+                                </span>
+                                <small class="text-muted">{{ event.dateDebut|date('d/m/Y') }}</small>
+                            </div>
+                            <h5 class="card-title">{{ event.nom }}</h5>
+                            <p class="card-text text-truncate text-muted">{{ event.details }}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div>
+                                    <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                    <small class="text-muted">{{ event.type }}</small>
+                                </div>
+                                <a href="{{ path('event_details', {'id': event.ID}) }}" class="btn btn-outline-primary btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No events found. Please try different filters or <a href="{{ path('user_create_event') }}" class="alert-link">create your own event</a>!
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        </ul>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply any initial filters from URL parameters directly
+            const urlParams = new URLSearchParams(window.location.search);
+            const typeFilter = urlParams.get('type');
+            
+            // If there's a type filter in the URL but no server-side filtering (direct page load),
+            // apply client-side filtering for immediate effect
+            if (typeFilter && !window.location.href.includes('?filter=')) {
+                const eventCards = document.querySelectorAll('.event-card');
+                
+                eventCards.forEach(card => {
+                    const eventType = card.getAttribute('data-type');
+                    card.style.display = (eventType === typeFilter) ? 'block' : 'none';
+                });
+            }
+            
+            // Preserve type filter when using quick filter buttons
+            document.querySelectorAll('.btn-group a').forEach(link => {
+                const url = new URL(link.href);
+                if (typeFilter) {
+                    url.searchParams.set('type', typeFilter);
+                    link.href = url.toString();
+                }
+            });
+            
+            // Form filter
+            const filterForm = document.getElementById('eventFilterForm');
+            if (filterForm) {
+                filterForm.addEventListener('submit', function(e) {
+                    // Let the form submit naturally - the server-side filtering will handle it
+                });
+            }
+            
+            // Add hover effects to cards for a more subtle, professional feel
+            const cards = document.querySelectorAll('.event-card .card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 8px 15px rgba(0, 0, 0, 0.1)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05)';
+                });
+            });
+        });
+    </script>
+{% endblock %} 

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Your Ticket Reservation Confirmation</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.5; padding: 20px; color: #333; }
+        h1 { color: #0056b3; }
+        p { margin-bottom: 10px; }
+        strong { color: #000; }
+        .details-section { border: 1px solid #ddd; padding: 15px; margin-top: 20px; background-color: #f9f9f9; border-radius: 5px; }
+        code { background-color: #eee; padding: 2px 4px; border-radius: 3px; }
+        .footer { margin-top: 30px; font-size: 0.9em; color: #777; }
+    </style>
+</head>
+<body>
+    <h1>Ticket Reservation Confirmed!</h1>
+
+    <p>Hello {% if user and user.prenom %}{{ user.prenom }}{% else %}User{% endif %},</p>
+
+    <p>Thank you for your reservation! Here are the details:</p>
+
+    <div class="details-section">
+        <h2>Reservation Details:</h2>
+        <p><strong>Reservation ID:</strong> {{ reservation.ID }}</p>
+        <p><strong>Reservation Date:</strong> {{ reservation.dateReservation|date('Y-m-d H:i:s') }}</p>
+    </div>
+
+    {% if event %}
+    <div class="details-section">
+        <h2>Event Details:</h2>
+        <p><strong>Event:</strong> {{ event.nom }}</p>
+        <p><strong>Date:</strong> {{ event.dateDebut|date('Y-m-d') }}{% if event.dateFin and event.dateFin != event.dateDebut %} to {{ event.dateFin|date('Y-m-d') }}{% endif %}</p>
+        {% if event.details %}<p><strong>Details:</strong> {{ event.details|nl2br }}</p>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if ticket %}
+    <div class="details-section">
+        <h2>Ticket Information:</h2>
+        <p><strong>Ticket Type:</strong> {{ ticket.typeBillet }}</p>
+        <p><strong>Quantity Reserved:</strong> {{ quantity }}</p>
+        <p><strong>Price per Ticket:</strong> ${{ ticket.prix|number_format(2, '.', ',') }}</p>
+        <p><strong>Total Price:</strong> ${{ (ticket.prix * quantity)|number_format(2, '.', ',') }}</p>
+        {# You might want to add the actual ticket ID or unique code if applicable/needed #}
+        {# <p><strong>Ticket ID:</strong> {{ ticket.ID }}</p> #}
+        {# <p><strong>Your Unique Code:</strong> <code>{{ ticket.codeUnique }}</code></p> #}
+    </div>
+    {% endif %}
+
+    <p style="margin-top: 20px;">Please keep this email for your records. If you have any questions, feel free to contact us.</p>
+
+    <div class="footer">
+        <p>Thank you!</p>
+        {# Add your organization name or branding here #}
+    </div>
+</body>
+</html> 

@@ -1,0 +1,63 @@
+<!-- View Modal for Ticket ID: {{ ticket.ID }} -->
+<div class="modal fade" id="viewTicketModal_{{ ticket.ID }}" tabindex="-1" aria-labelledby="viewTicketModalLabel_{{ ticket.ID }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewTicketModalLabel_{{ ticket.ID }}">View Ticket Details (ID: {{ ticket.ID }})</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <strong>Type:</strong> {{ ticket.typeBillet }}
+                </div>
+                <div class="mb-3">
+                    <strong>Price:</strong> ${{ ticket.prix|number_format(2, '.', ',') }}
+                </div>
+                <div class="mb-3">
+                    <strong>Event:</strong>
+                    {% if ticket.evenement %}
+                        {{ ticket.evenement.nom }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <strong>Quantity:</strong> {{ ticket.quantite }}
+                </div>
+                <div class="mb-3">
+                    <strong>Status:</strong>
+                    {% if ticket.statut == 'Valide' %}
+                        <span class="badge bg-success">Valide</span>
+                    {% elseif ticket.statut == 'Annulé' %}
+                        <span class="badge bg-danger">Annulé</span>
+                    {% else %}
+                        <span class="badge bg-warning">Non valide</span>
+                    {% endif %}
+                </div>
+                {% if ticket.codeUnique %}
+                <div class="mb-3">
+                    <strong>Code Unique:</strong>
+                    <code>{{ ticket.codeUnique }}</code>
+                </div>
+                <div class="mb-3">
+                    <strong>QR Code:</strong><br>
+                    {# Link to external QR code generator or use endroid/qr-code-bundle if configured #}
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ ticket.codeUnique }}" 
+                         alt="QR Code" class="img-fluid mt-2 border p-2" style="max-width: 150px;">
+                    <div class="mt-2">
+                        <a href="{{ path('admin_ticket_qrcode', {'id': ticket.ID}) }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-external-link-alt me-1"></i> View QR Code Page
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{{ path('cart_add', {'id': ticket.ID}) }}" class="btn btn-success">
+                    <i class="fas fa-cart-plus me-1"></i> Add to Cart
+                </a>
+            </div>
+        </div>
+    </div>
+</div> 

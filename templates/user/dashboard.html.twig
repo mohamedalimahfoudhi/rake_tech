@@ -1,0 +1,277 @@
+{% extends 'user/layout.html.twig' %}
+
+{% block user_content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+        <h1 class="h2">My Dashboard</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ path('user_events') }}" class="btn btn-primary me-2">
+                <i class="fas fa-calendar-alt me-1"></i> Browse Events
+            </a>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                <i class="fas fa-plus me-1"></i> Create Event
+            </button>
+        </div>
+    </div>
+
+    <!-- Create Event Modal -->
+    <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createEventModalLabel">Create New Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ path('user_create_event') }}" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="eventName" class="form-label">Event Name</label>
+                            <input type="text" class="form-control" id="eventName" name="nom" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startDate" class="form-label">Start Date</label>
+                                <input type="datetime-local" class="form-control" id="startDate" name="dateDebut" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endDate" class="form-label">End Date</label>
+                                <input type="datetime-local" class="form-control" id="endDate" name="dateFin" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="eventType" class="form-label">Event Type</label>
+                                <select class="form-select" id="eventType" name="type" required>
+                                    <option value="TERRAIN">TERRAIN</option>
+                                    <option value="PADDEL">PADDEL</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="maxParticipants" class="form-label">Max Participants</label>
+                                <input type="number" class="form-control" id="maxParticipants" name="participantsMax" min="1" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventDetails" class="form-label">Event Details</label>
+                            <textarea class="form-control" id="eventDetails" name="details" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Create Event</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <!-- Upcoming Events Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Upcoming Events
+                        </div>
+                        <a href="{{ path('user_events') }}" class="btn btn-sm btn-light">View All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_events|length > 0 %}
+                        <div class="row">
+                            {% for event in upcoming_events %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 shadow-sm">
+                                        {% if (event.dateDebut|date('Y-m-d')) == ('now'|date('Y-m-d')) %}
+                                            <div class="ribbon ribbon-top-right"><span>Today</span></div>
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ event.nom }}</h5>
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="badge bg-primary">{{ event.type }}</span>
+                                                <div class="text-end">
+                                                    <small class="d-block text-muted">{{ event.dateDebut|date('D, d M Y') }}</small>
+                                                    <small class="d-block text-muted">{{ event.dateDebut|date('H:i') }}</small>
+                                                </div>
+                                            </div>
+                                            <p class="card-text text-truncate">{{ event.details }}</p>
+                                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                                <div>
+                                                    <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                                    <small>{{ event.type }}</small>
+                                                </div>
+                                                <a href="{{ path('event_details', {'id': event.id}) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No upcoming events found. <a href="{{ path('user_events') }}">Browse all events</a> or <a href="{{ path('user_create_event') }}">create your own</a>!
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- User Profile Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-user me-1"></i>
+                    My Profile
+                </div>
+                <div class="card-body text-center">
+                    <div class="avatar mb-3">
+                        <img src="https://via.placeholder.com/100" class="rounded-circle" alt="Profile Image">
+                    </div>
+                    <h5 class="card-title">{{ app.user.prenom }} {{ app.user.nom }}</h5>
+                    <p class="card-text text-muted">{{ app.user.email }}</p>
+                    <a href="{{ path('user_profile') }}" class="btn btn-outline-info">Edit Profile</a>
+                </div>
+            </div>
+
+            <!-- My Tickets Summary -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <i class="fas fa-ticket-alt me-1"></i>
+                    My Tickets
+                </div>
+                <div class="card-body">
+                    {% if user_tickets|length > 0 %}
+                        <ul class="list-group list-group-flush">
+                            {% for ticket in user_tickets %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ ticket.evenement.nom }}
+                                    <span class="badge bg-primary rounded-pill">{{ ticket.quantite }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <div class="text-center mt-3">
+                            <a href="{{ path('user_tickets') }}" class="btn btn-outline-success">View All Tickets</a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No tickets found. <a href="{{ path('user_events') }}">Browse events</a> to purchase tickets!
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <i class="fas fa-bolt me-1"></i>
+                    Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <a href="{{ path('user_events') }}" class="text-decoration-none">
+                                <div class="p-4 bg-light rounded">
+                                    <i class="fas fa-calendar-alt fa-2x mb-3 text-primary"></i>
+                                    <h5>Browse Events</h5>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <a href="{{ path('user_create_event') }}" class="text-decoration-none">
+                                <div class="p-4 bg-light rounded">
+                                    <i class="fas fa-plus-circle fa-2x mb-3 text-success"></i>
+                                    <h5>Create Event</h5>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <a href="{{ path('user_tickets') }}" class="text-decoration-none">
+                                <div class="p-4 bg-light rounded">
+                                    <i class="fas fa-ticket-alt fa-2x mb-3 text-warning"></i>
+                                    <h5>My Tickets</h5>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ path('user_my_events') }}" class="text-decoration-none">
+                                <div class="p-4 bg-light rounded">
+                                    <i class="fas fa-list fa-2x mb-3 text-danger"></i>
+                                    <h5>My Events</h5>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Ribbon for "Today" events */
+        .ribbon {
+            width: 150px;
+            height: 150px;
+            overflow: hidden;
+            position: absolute;
+            z-index: 1;
+        }
+        .ribbon-top-right {
+            top: -10px;
+            right: -10px;
+        }
+        .ribbon-top-right::before,
+        .ribbon-top-right::after {
+            border-top-color: transparent;
+            border-right-color: transparent;
+        }
+        .ribbon-top-right::before {
+            top: 0;
+            left: 0;
+        }
+        .ribbon-top-right::after {
+            bottom: 0;
+            right: 0;
+        }
+        .ribbon-top-right span {
+            position: absolute;
+            top: 30px;
+            right: -25px;
+            transform: rotate(45deg);
+            width: 100px;
+            background: #ffb400;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 5px 0;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize datetime inputs with current date/time
+            const now = new Date();
+            const startDate = document.getElementById('startDate');
+            const endDate = document.getElementById('endDate');
+            
+            if (startDate && endDate) {
+                startDate.min = now.toISOString().slice(0, 16);
+                endDate.min = now.toISOString().slice(0, 16);
+                
+                startDate.addEventListener('change', function() {
+                    endDate.min = this.value;
+                });
+            }
+        });
+    </script>
+{% endblock %} 

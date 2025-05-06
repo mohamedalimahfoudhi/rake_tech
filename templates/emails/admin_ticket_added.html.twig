@@ -1,0 +1,52 @@
+{# templates/emails/admin_ticket_added.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>New Ticket Added</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.5; padding: 20px; }
+        h1 { color: #333; }
+        p { margin-bottom: 10px; }
+        strong { color: #555; }
+        .details-section { border: 1px solid #ddd; padding: 15px; margin-top: 20px; background-color: #f9f9f9; }
+        code { background-color: #eee; padding: 2px 4px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>New Ticket Added</h1>
+
+    <p>Hello {% if user and user.prenom %}{{ user.prenom }}{% else %}Admin{% endif %},</p>
+
+    <p>A new ticket has been successfully added via the admin interface by you.</p>
+
+    <div class="details-section">
+        <h2>Ticket Details:</h2>
+        <p><strong>ID:</strong> {{ ticket.ID }}</p>
+        <p><strong>Code Unique:</strong> <code>{{ ticket.codeUnique }}</code></p>
+        <p><strong>Type:</strong> {{ ticket.typeBillet }}</p>
+        <p><strong>Price:</strong> ${{ ticket.prix|number_format(2, '.', ',') }}</p>
+        <p><strong>Quantity:</strong> {{ ticket.quantite }}</p>
+        <p><strong>Status:</strong> {{ ticket.statut }}</p>
+        {% if event %}
+        <p><strong>Event:</strong> {{ event.nom }} (ID: {{ event.ID }})</p>
+        {% else %}
+        <p><strong>Event:</strong> Not specified</p>
+        {% endif %}
+        <p><strong>Added At:</strong> {{ ticket.dateAchat|date('Y-m-d H:i:s') }}</p>
+    </div>
+
+    {# Add User Details Section #}
+    {% if user %}
+    <div class="details-section">
+        <h2>Action performed by:</h2>
+        <p><strong>Name:</strong> {{ user.prenom|default('N/A') }} {{ user.nom|default('N/A') }}</p>
+        <p><strong>Email:</strong> {{ user.email|default('N/A') }}</p>
+        {# Add other relevant user fields if needed #}
+        {# <p><strong>Role:</strong> {{ user.role ? user.role.roleNom : 'N/A' }}</p> #}
+    </div>
+    {% endif %}
+
+    <p style="margin-top: 20px; color: #777;">This is an automated notification.</p>
+</body>
+</html> 

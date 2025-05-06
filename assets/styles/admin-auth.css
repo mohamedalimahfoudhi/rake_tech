@@ -1,0 +1,363 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+    list-style: none;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(90deg, #e2e2e2, #a8e6cf);
+}
+
+/* Admin Dashboard Layout */
+.admin-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 280px;
+    background: #2ecc71;
+    padding: 30px 0;
+    color: #fff;
+    position: fixed;
+    height: 100%;
+    overflow-y: auto;
+    transition: all 0.3s;
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.2);
+    z-index: 1000;
+}
+
+.sidebar-header {
+    padding: 0 30px 30px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 30px;
+}
+
+.sidebar-header h3 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+/* Logo styling for admin panel */
+.sidebar-header .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-header .logo:hover {
+    transform: scale(1.1);
+}
+
+.sidebar-header .logo:hover .logo-racket {
+    animation: spin 1s ease;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.sidebar-header .logo-racket {
+    font-size: 1.8rem;
+    margin-right: 5px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.sidebar-header .logo-text {
+    background: linear-gradient(45deg, #ffffff, #f1f1f1);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    animation: gradient 3s ease infinite;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.sidebar-menu {
+    padding: 0 30px;
+}
+
+.sidebar-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-menu li {
+    margin-bottom: 15px;
+}
+
+.sidebar-menu a {
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.sidebar-menu a:hover, .sidebar-menu a.active {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+}
+
+.sidebar-menu i {
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+/* Main content area */
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 30px;
+    transition: all 0.3s;
+}
+
+/* Cards and UI elements */
+.card {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+    overflow: hidden;
+}
+
+.card-header {
+    background: #2ecc71;
+    color: #fff;
+    padding: 20px;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-footer {
+    padding: 15px 20px;
+    background: #f9f9f9;
+    border-top: 1px solid #eee;
+}
+
+/* Form elements similar to auth.css */
+.input-group {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.input-group input, .input-group select, .input-group textarea {
+    width: 100%;
+    padding: 13px 20px;
+    background: #eee;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+.input-group input::placeholder {
+    color: #888;
+    font-weight: 400;
+}
+
+.input-group i {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #2ecc71;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 20px;
+    background: #2ecc71;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #fff;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    background: #27ae60;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #eee;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #ddd;
+}
+
+.btn-danger {
+    background: #ff6b6b;
+}
+
+.btn-danger:hover {
+    background: #ff5252;
+}
+
+.btn-success {
+    background: #51cf66;
+}
+
+.btn-success:hover {
+    background: #40c057;
+}
+
+/* Tables */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.table th {
+    background: #2ecc71;
+    color: #fff;
+    padding: 15px;
+    text-align: left;
+}
+
+.table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.table tr:hover {
+    background: #f9f9f9;
+}
+
+/* Responsive layout */
+@media (max-width: 992px) {
+    .sidebar {
+        width: 80px;
+        overflow: hidden;
+    }
+    
+    .sidebar-header h3, .sidebar-header p, .sidebar-menu a span {
+        display: none;
+    }
+    
+    .sidebar-header .logo {
+        justify-content: center;
+        margin-bottom: 0;
+    }
+    
+    .sidebar-header .logo-text {
+        display: none;
+    }
+    
+    .sidebar-header .logo-racket {
+        margin-right: 0;
+        font-size: 2rem;
+        animation: bounce-small 2s infinite;
+    }
+    
+    @keyframes bounce-small {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-6px);
+        }
+        60% {
+            transform: translateY(-3px);
+        }
+    }
+    
+    .sidebar-menu a {
+        justify-content: center;
+        padding: 15px;
+    }
+    
+    .sidebar-menu i {
+        margin: 0;
+        font-size: 22px;
+    }
+    
+    .main-content {
+        margin-left: 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        width: 280px;
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+    
+    .sidebar-header h3, .sidebar-header p, .sidebar-menu a span {
+        display: block;
+    }
+    
+    .sidebar-menu a {
+        justify-content: flex-start;
+        padding: 12px 15px;
+    }
+    
+    .sidebar-menu i {
+        margin-right: 10px;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+} 
