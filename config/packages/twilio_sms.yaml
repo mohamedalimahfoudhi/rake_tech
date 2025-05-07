@@ -1,0 +1,11 @@
+# Twilio SMS bundle configuration
+twilio_sms:
+    account_sid: '%env(TWILIO_ACCOUNT_SID)%'
+    auth_token: '%env(TWILIO_AUTH_TOKEN)%'
+    phone_number: '%env(TWILIO_PHONE_NUMBER)%'
+
+# Parameters for backward compatibility
+parameters:
+    twilio_account_sid: '%env(TWILIO_ACCOUNT_SID)%'
+    twilio_auth_token: '%env(TWILIO_AUTH_TOKEN)%'
+    twilio_phone_number: '%env(TWILIO_PHONE_NUMBER)%' 

@@ -1,0 +1,77 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+    <div>
+        {{ form_label(form.details) }}
+        {{ form_widget(form.details) }}
+        {% if form.details.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.details.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div>
+        {{ form_label(form.name) }}
+        {{ form_widget(form.name) }}
+        {% if form.name.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.name.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div>
+        {{ form_label(form.startDate) }}
+        {{ form_widget(form.startDate) }}
+        {% if form.startDate.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.startDate.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div>
+        {{ form_label(form.endDate) }}
+        {{ form_widget(form.endDate) }}
+        {% if form.endDate.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.endDate.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div>
+        {{ form_label(form.reward) }}
+        {{ form_widget(form.reward) }}
+        {% if form.reward.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.reward.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div>
+        {{ form_label(form.terrain) }}
+        {{ form_widget(form.terrain) }}
+        {% if form.terrain.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.terrain.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <button class="btn">{{ button_label|default('Save') }}</button>
+
+{{ form_end(form) }}

@@ -1,0 +1,56 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+    
+
+    <div>
+        {{ form_label(form.name) }}
+        {{ form_widget(form.name) }}
+        {% if form.name.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.name.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    
+
+    <div>
+        {{ form_label(form.location) }}
+        {{ form_widget(form.location) }}
+        {% if form.location.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.location.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <div>
+        {{ form_label(form.courtType) }}
+        {{ form_widget(form.courtType) }}
+        {% if form.courtType.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.courtType.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <div>
+        {{ form_label(form.status) }}
+        {{ form_widget(form.status) }}
+        {% if form.status.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.status.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+   
+    <button class="btn">{{ button_label|default('Save') }}</button>
+
+{{ form_end(form) }}

@@ -1,0 +1,209 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Management{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .search-container {
+            position: relative;
+        }
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        .search-results.active {
+            display: block;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1>User Management</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ path('app_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <button id="exportPdf" class="btn btn-danger">
+                <i class="fas fa-file-pdf"></i> Export to PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form method="get" class="search-container d-flex gap-2">
+                <div class="flex-grow-1">
+                    <input type="text" name="search" id="searchInput" class="form-control" placeholder="Search users..." value="{{ search }}">
+                </div>
+                <div class="flex-shrink-0" style="width: 200px;">
+                    <select name="role" id="roleFilter" class="form-control">
+                        <option value="">All Roles</option>
+                        {% for role in roles %}
+                            <option value="{{ role.roleID }}" {% if selected_role == role.roleID %}selected{% endif %}>
+                                {{ role.roleNom }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex-shrink-0">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div class="table-responsive">
+        <table class="table table-striped" id="usersTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in pagination %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.prenom }}</td>
+                        <td>{{ user.nom }}</td>
+                        <td>{{ user.numeroTelephone }}</td>
+                        <td>{{ user.role.roleNom }}</td>
+                        <td>
+                            <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-sm btn-primary">Edit</a>
+                            <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                <button class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No users found</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dynamic search
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.trim();
+                    // Submit form regardless of query length to show all users when empty
+                    this.form.submit();
+                });
+            } else {
+                console.error('Search input element not found');
+            }
+
+            // Export to PDF
+            const exportButton = document.getElementById('exportPdf');
+            if (exportButton) {
+                exportButton.addEventListener('click', function() {
+                    try {
+                        // Check if jsPDF is loaded
+                        if (typeof window.jspdf === 'undefined') {
+                            throw new Error('jsPDF library not loaded');
+                        }
+
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF('l', 'mm', 'a4');
+                        
+                        // Get table data
+                        const table = document.getElementById('usersTable');
+                        if (!table) {
+                            throw new Error('Users table not found');
+                        }
+
+                        const rows = Array.from(table.querySelectorAll('tbody tr'));
+                        if (rows.length === 0) {
+                            throw new Error('No data to export');
+                        }
+                        
+                        const tableData = rows.map(row => {
+                            const cells = Array.from(row.querySelectorAll('td'));
+                            return cells.slice(0, -1).map(cell => cell.textContent.trim());
+                        });
+
+                        // Add title
+                        doc.setFontSize(16);
+                        doc.text('User Management Report', 14, 15);
+                        
+                        // Add date
+                        doc.setFontSize(10);
+                        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 22);
+
+                        // Create table
+                        doc.autoTable({
+                            head: [['ID', 'Email', 'First Name', 'Last Name', 'Phone', 'Role']],
+                            body: tableData,
+                            startY: 30,
+                            theme: 'grid',
+                            styles: {
+                                fontSize: 8,
+                                cellPadding: 2
+                            },
+                            headStyles: {
+                                fillColor: [66, 139, 202],
+                                textColor: 255
+                            }
+                        });
+
+                        // Save the PDF
+                        doc.save('users-list.pdf');
+                    } catch (error) {
+                        console.error('Error generating PDF:', error);
+                        alert('Error generating PDF: ' + error.message);
+                    }
+                });
+            } else {
+                console.error('Export PDF button not found');
+            }
+        });
+    </script>
+{% endblock %} 
