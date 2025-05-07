@@ -47,8 +47,6 @@
                                 {% elseif emprunt.statutemprunt == 'En retard' %}
                                     <p class="badge bg-danger">En retard</p>
                                 {% endif %}
-<<<<<<< HEAD
-=======
 
                                 <!-- Show the 'Signaler en panne' button only if 'signaler' is null -->
                                 {% if emprunt.materielid.signaler is null %}
@@ -58,15 +56,10 @@
                                 {% else %}
                                     <p class="text-muted">Matériel déjà signalé comme étant en panne.</p>
                                 {% endif %}
->>>>>>> origin/gest-materials
                             </div>
                         </div>
                     </div>
                 {% endfor %}
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/gest-materials
             {% endif %}
         </div>
     </div>
