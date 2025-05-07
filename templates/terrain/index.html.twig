@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Terrain index{% endblock %}
+
+{% block body %}
+    <h1>Terrain index</h1>
+
+    <!-- Champ de recherche -->
+    <input type="text" id="searchInput" placeholder="Rechercher un terrain..." class="form-control mb-3">
+
+    <table class="table" id="terrainTable">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>CourtType</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for terrain in terrains %}
+            <tr>
+                <td>{{ terrain.id }}</td>
+                <td>{{ terrain.courtType }}</td>
+                <td>{{ terrain.location }}</td>
+                <td>{{ terrain.status }}</td>
+                <td>
+                    <a href="{{ path('app_terrain_show', {'id': terrain.id}) }}">show</a>
+                    <a href="{{ path('app_terrain_edit', {'id': terrain.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_terrain_new') }}">Create new</a>
+
+    <!-- Script JS pour filtrer -->
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#terrainTable tbody tr');
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                row.style.display = rowText.includes(searchValue) ? '' : 'none';
+            });
+        });
+    </script>
+{% endblock %}
