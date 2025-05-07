@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier la Maintenance{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .delete-form {
+            display: inline-block;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_maintenance_index') }}">Maintenances</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('app_maintenance_show', {'id': maintenance.maintenanceid}) }}">Maintenance #{{ maintenance.maintenanceid }}</a></li>
+                <li class="breadcrumb-item active">Modifier</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Modifier la Maintenance #{{ maintenance.maintenanceid }}</h1>
+        </div>
+
+        {{ include('maintenance/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+
+        <div class="mt-3">
+            {{ include('maintenance/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %} 

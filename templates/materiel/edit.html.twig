@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le Matériel{% endblock %}
+
+{% block page_title %}Modifier le Matériel{% endblock %}
+
+{% block body %}
+    {{ include('materiel/_form.html.twig', {
+        'title': 'Modifier le Matériel',
+        'button_label': 'Mettre à jour'
+    }) }}
+{% endblock %} 

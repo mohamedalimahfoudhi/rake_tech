@@ -1,0 +1,109 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.datemaintenance) }}
+                    {{ form_widget(form.datemaintenance, {
+                        'attr': {
+                            'class': 'form-control datepicker',
+                            'min': "now"|date('Y-m-d'),
+                            'data-date-min': "now"|date('Y-m-d')
+                        }
+                    }) }}
+                    {{ form_errors(form.datemaintenance) }}
+                    <div class="invalid-feedback">
+                        La date de maintenance doit être aujourd'hui ou dans le futur
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  {{ form_widget(form.statutmaintenance, {
+    'attr': {'class': 'form-select'}
+}) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description, {
+                        'attr': {
+                            'class': 'form-control',
+                            'rows': 4,
+                            'style': 'resize: vertical;',
+                            'minlength': 10
+                        }
+                    }) }}
+                    {{ form_errors(form.description) }}
+                    <div class="invalid-feedback">
+                        La description doit faire au moins 10 caractères
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.materielid) }}
+                    {{ form_widget(form.materielid, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_errors(form.materielid) }}
+                    <small class="form-text text-muted">Sélectionnez le matériel concerné par la maintenance</small>
+                </div>
+            </div>
+        </div>
+            <a href="{{ path('app_maintenance_index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+{{ form_end(form) }}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.querySelector('#maintenance_datemaintenance');
+    const form = document.querySelector('form');
+    const submitButton = document.querySelector('#submitButton');
+
+    // Validation de la date
+    function validateDate() {
+        const selectedDate = new Date(dateInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (selectedDate < today) {
+            dateInput.setCustomValidity('La date ne peut pas être dans le passé');
+            return false;
+        } else {
+            dateInput.setCustomValidity('');
+            return true;
+        }
+    }
+
+    // Configuration du datepicker
+    if (dateInput) {
+        dateInput.type = 'date';
+        dateInput.min = new Date().toISOString().split('T')[0];
+        
+        dateInput.addEventListener('input', validateDate);
+        dateInput.addEventListener('change', validateDate);
+    }
+
+    // Validation du formulaire
+    form.addEventListener('submit', function(event) {
+        if (!validateDate()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+document.addEventListener('DOMContentLoaded', function() {
+    const statutMaintenanceSelect = document.querySelector('[name="form[statutmaintenance]"]');
+    
+    statutMaintenanceSelect.addEventListener('change', function() {
+        console.log(statutMaintenanceSelect.value); // This will log the selected value (e.g., 'Planifié')
+    });
+});
+</script>
+{% endblock %} 

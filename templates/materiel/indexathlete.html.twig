@@ -1,0 +1,46 @@
+{# templates/materiel/index.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Matériels Disponibles{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Matériels Disponibles</h1>
+
+        {% if app.session.flashbag.get('success') %}
+            <div class="alert alert-success">
+                {% for message in app.session.flashbag.get('success') %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if app.session.flashbag.get('error') %}
+            <div class="alert alert-danger">
+                {% for message in app.session.flashbag.get('error') %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="row">
+            {% for materiel in materiels %}
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="{{ asset('images/' ~ materiel.type ~ '.jpg') }}" class="card-img-top" alt="{{ materiel.type }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ materiel.type }} - {{ materiel.typesport }}</h5>
+                            <p class="card-text">Prix: {{ materiel.prix }} EUR</p>
+                            <p class="card-text"><strong>Propriétaire:</strong> {{ materiel.ownertype }}</p>
+
+                            <form action="{{ path('louer_materiel', {'id': materiel.id}) }}" method="POST">
+                                <button type="submit" class="btn btn-primary">Louer</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

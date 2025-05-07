@@ -1,0 +1,13 @@
+framework:
+    asset_mapper:
+        enabled: true
+        missing_import_mode: strict
+        excluded_patterns:
+            - '**/*.map'
+            - '*/assets/build/*'
+        
+
+when@prod:
+    framework:
+        asset_mapper:
+            missing_import_mode: warn

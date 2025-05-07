@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Tournoi{% endblock %}
+
+{% block page_title %}Nouveau Tournoi{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Créer un nouveau tournoi</h5>
+            </div>
+            <div class="card-body">
+                {{ include('tournoi/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

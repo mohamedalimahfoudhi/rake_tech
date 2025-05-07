@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Maintenances - RackeTech</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.4;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .date {
+            margin-top: 10px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .status-planifie {
+            color: orange;
+            font-weight: bold;
+        }
+        .status-en-cours {
+            color: blue;
+            font-weight: bold;
+        }
+        .status-termine {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">RackeTech - Gestion des Maintenances</div>
+        <div class="date">Exporté le {{ date|date('d/m/Y à H:i') }}</div>
+    </div>
+    
+    <h1>Liste des Maintenances</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Matériel</th>
+                <th>Date de Maintenance</th>
+                <th>Statut</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for maintenance in maintenances %}
+                <tr>
+                    <td>{{ maintenance.maintenanceId }}</td>
+                    <td>{{ maintenance.materielid ? maintenance.materielid.type : 'N/A' }}</td>
+                    <td>{{ maintenance.dateMaintenance ? maintenance.dateMaintenance|date('d/m/Y') : 'Non définie' }}</td>
+                    <td>
+                        {% if maintenance.statutMaintenance == 'Planifié' %}
+                            <span class="status-planifie">Planifié</span>
+                        {% elseif maintenance.statutMaintenance == 'En cours' %}
+                            <span class="status-en-cours">En cours</span>
+                        {% elseif maintenance.statutMaintenance == 'Terminé' %}
+                            <span class="status-termine">Terminé</span>
+                        {% else %}
+                            {{ maintenance.statutMaintenance }}
+                        {% endif %}
+                    </td>
+                    <td>{{ maintenance.description }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">Aucune maintenance trouvée</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="footer">
+        <p>Document généré automatiquement par l'application RackeTech</p>
+        <p>© {{ 'now'|date('Y') }} RackeTech - Tous droits réservés</p>
+    </div>
+</body>
+</html> 

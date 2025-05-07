@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_admin_dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_profile') }}">
+                            <i class="fas fa-user"></i> Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ path('app_user_management') }}">
+                            <i class="fas fa-users"></i> User Management
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Edit User</h1>
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Edit User Details</h5>
+                </div>
+                <div class="card-body">
+                    {{ form_start(userForm) }}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form_label(userForm.email) }}
+                                    {{ form_widget(userForm.email, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(userForm.email) }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form_label(userForm.plainPassword) }}
+                                    {{ form_widget(userForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                                    <small class="form-text text-muted">Leave blank to keep the current password</small>
+                                    {{ form_errors(userForm.plainPassword) }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form_label(userForm.prenom) }}
+                                    {{ form_widget(userForm.prenom, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(userForm.prenom) }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form_label(userForm.nom) }}
+                                    {{ form_widget(userForm.nom, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(userForm.nom) }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form_label(userForm.genre) }}
+                                    {{ form_widget(userForm.genre, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(userForm.genre) }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form_label(userForm.numeroTelephone) }}
+                                    {{ form_widget(userForm.numeroTelephone, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(userForm.numeroTelephone) }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form_label(userForm.adresse) }}
+                                    {{ form_widget(userForm.adresse, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(userForm.adresse) }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form_label(userForm.nomOrganisation) }}
+                                    {{ form_widget(userForm.nomOrganisation, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(userForm.nomOrganisation) }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form_label(userForm.role) }}
+                                    {{ form_widget(userForm.role, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(userForm.role) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <a href="{{ path('app_user_management') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    {{ form_end(userForm) }}
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %} 

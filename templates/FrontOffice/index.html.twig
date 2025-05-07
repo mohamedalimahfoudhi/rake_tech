@@ -1,0 +1,343 @@
+{% extends 'Front.html.twig' %}
+
+{% block title %}Accueil - Gymnase{% endblock %}
+
+{% block body %}
+    <!-- Hero Section -->
+    <div class="container-fluid hero animate-fade-in bg-light">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="text-primary mb-4">Gymnase Events</h1>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="#tournaments" class="btn btn-primary btn-lg">Voir les Tournois</a>
+                    <a href="#tickets" class="btn btn-outline-primary btn-lg">Voir les Billets</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tournaments Section -->
+    <div class="container-fluid py-5" id="tournaments">
+        <div class="mb-5 text-center">
+            <h2 class="display-4 mb-3">Nos Tournois</h2>
+            <div class="separator mx-auto"></div>
+        </div>
+        <div class="row g-4 justify-content-center">
+            {% if tournaments is defined and tournaments|length > 0 %}
+                {% for tournament in tournaments %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="tournament-card animate-fade-in" style="animation-delay: {{ loop.index0 * 0.2 }}s;">
+                            <div class="card-banner bg-primary">
+                                <i class="fas fa-trophy banner-icon"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3 class="card-title">{{ tournament.nom }}</h3>
+                                <div class="status-badge {% if tournament.statut == 'En_cours' %}status-active{% elseif tournament.statut == 'Prévu' %}status-upcoming{% elseif tournament.statut == 'Terminé' %}status-ended{% else %}status-cancelled{% endif %}">
+                                    {{ tournament.statut }}
+                                </div>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <i class="far fa-calendar-alt"></i>
+                                        <span>{{ tournament.dateDebut|date('d/m/Y') }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="far fa-calendar-check"></i>
+                                        <span>{{ tournament.dateFin|date('d/m/Y') }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>{{ tournament.lieu }}</span>
+                                    </div>
+                                </div>
+                                <a href="{{ path('app_tournament_show', {'id': tournament.id}) }}" class="btn btn-outline-primary w-100 mt-3">
+                                    <i class="fas fa-info-circle me-2"></i>Détails
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times empty-icon"></i>
+                        <p>Aucun tournoi n'est prévu pour le moment.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tickets Section -->
+    <div class="container-fluid py-5 bg-light" id="tickets">
+        <div class="mb-5 text-center">
+            <h2 class="display-4 mb-3">Billets Disponibles</h2>
+            <div class="separator mx-auto"></div>
+        </div>
+        <div class="row g-4 justify-content-center">
+            {% if billets is defined and billets|length > 0 %}
+                {% for billet in billets %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="ticket-card animate-fade-in" style="animation-delay: {{ loop.index0 * 0.2 }}s;">
+                            <div class="card-ribbon">
+                                <span class="ribbon-text">{{ billet.typeBillet }}</span>
+                            </div>
+                            <div class="price-circle">
+                                <span class="price-amount">{{ billet.prix }}€</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="quantity-badge {% if billet.quantite > 10 %}high{% elseif billet.quantite > 0 %}low{% else %}sold{% endif %}">
+                                    {% if billet.quantite > 0 %}
+                                        {{ billet.quantite }} places restantes
+                                    {% else %}
+                                        Complet
+                                    {% endif %}
+                                </div>
+                                <div class="ticket-features">
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <span>Accès {{ billet.typeBillet }}</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <span>Place garantie</span>
+                                    </div>
+                                </div>
+                                {% if billet.statut == 'Valide' and billet.quantite > 0 %}
+                                    <a href="{{ path('app_reservation_new', {'billet': billet.id}) }}" class="btn btn-primary w-100 mt-3">
+                                        <i class="fas fa-ticket-alt me-2"></i>Réserver
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-secondary w-100 mt-3" disabled>
+                                        <i class="fas fa-ban me-2"></i>Non disponible
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="empty-state">
+                        <i class="fas fa-ticket-alt empty-icon"></i>
+                        <p>Aucun billet n'est disponible pour le moment.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Reservations Section -->
+    <div class="container-fluid py-5" id="reservations">
+        <div class="mb-5 text-center">
+            <h2 class="display-4 mb-5">Mes Réservations</h2>
+        </div>
+        {% if app.user %}
+            <div class="row g-4">
+                {% if reservations is defined and reservations|length > 0 %}
+                    {% for reservation in reservations %}
+                        <div class="col-lg-4">
+                            <div class="ticket-card animate-fade-in" style="animation-delay: {{ loop.index0 * 0.2 }}s;">
+                                <h3 class="text-uppercase">Réservation #{{ reservation.id }}</h3>
+                                <div class="features">
+                                    <div class="feature-item">
+                                        <span>Date</span>
+                                        <span>{{ reservation.date|date('d/m/Y') }}</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <span>Type</span>
+                                        <span>{{ reservation.type }}</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <span>Statut</span>
+                                        <span class="badge {% if reservation.statut == 'Validé' %}bg-success{% elseif reservation.statut == 'En_attente' %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ reservation.statut }}
+                                        </span>
+                                    </div>
+                                    {% if reservation.billet %}
+                                        <div class="feature-item">
+                                            <span>Billet</span>
+                                            <span>{{ reservation.billet.typeBillet }} - {{ reservation.billet.prix }}€</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}" class="btn btn-primary mt-3">Voir les détails</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12 text-center">
+                        <p>Vous n'avez pas encore de réservations.</p>
+                        <a href="#tickets" class="btn btn-primary">Réserver un billet</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p>Connectez-vous pour voir vos réservations.</p>
+                    <a href="#" class="btn btn-primary">Se connecter</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Testimonials Section -->
+    <div class="container-fluid py-5">
+        <h2 class="mb-4">Avis des clients</h2>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .separator {
+            width: 80px;
+            height: 3px;
+            background: var(--primary);
+            margin-bottom: 2rem;
+        }
+
+        .tournament-card, .ticket-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .tournament-card:hover, .ticket-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .card-banner {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .banner-icon {
+            font-size: 3rem;
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .status-active { background: #e1f7e1; color: #28a745; }
+        .status-upcoming { background: #e1f0ff; color: #007bff; }
+        .status-ended { background: #e9ecef; color: #6c757d; }
+        .status-cancelled { background: #ffe1e1; color: #dc3545; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .card-ribbon {
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            transform: rotate(45deg);
+            width: 150px;
+            background: var(--primary);
+            text-align: center;
+            color: white;
+            padding: 5px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            z-index: 1;
+        }
+
+        .price-circle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .quantity-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            margin: 1rem 0;
+        }
+
+        .quantity-badge.high { background: #e1f7e1; color: #28a745; }
+        .quantity-badge.low { background: #fff3cd; color: #ffc107; }
+        .quantity-badge.sold { background: #ffe1e1; color: #dc3545; }
+
+        .ticket-features {
+            margin: 1.5rem 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .hero {
+            padding: 5rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+    </style>
+{% endblock %} 

@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Form;
+
+use App\Entity\Terrain;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class TerrainType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('name')
+            ->add('location')
+            ->add('courtType', ChoiceType::class, [
+                'choices'  => [
+                    'Padel' => 'Padel',
+                    'Tennis' => 'Tennis',
+                ],
+                'required' => true,
+                'data' => 'Padel',
+            ])
+          
+            ->add('status', ChoiceType::class, [
+                'choices'  => [
+                    'Available' => 'Available',
+                    'Reserved' => 'Reserved',
+                ],
+                'required' => true,
+                'data' => 'Available',
+            ]);        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Terrain::class,
+        ]);
+    }
+}

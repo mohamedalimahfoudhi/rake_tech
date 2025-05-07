@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Emprunts - RackeTech</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.4;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .date {
+            margin-top: 10px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .status-emprunte {
+            color: blue;
+            font-weight: bold;
+        }
+        .status-retourne {
+            color: green;
+            font-weight: bold;
+        }
+        .status-retard {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">RackeTech - Gestion des Emprunts</div>
+        <div class="date">Exporté le {{ date|date('d/m/Y à H:i') }}</div>
+    </div>
+    
+    <h1>Liste des Emprunts</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Utilisateur</th>
+                <th>Matériel</th>
+                <th>Date d'emprunt</th>
+                <th>Date de retour</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emprunt in emprunts %}
+                <tr>
+                    <td>{{ emprunt.empruntId }}</td>
+                    <td>{{ emprunt.userid ? emprunt.userid.prenom ~ ' ' ~ emprunt.userid.nom : 'N/A' }}</td>
+                    <td>{{ emprunt.materielid ? emprunt.materielid.type : 'N/A' }}</td>
+                    <td>{{ emprunt.dateEmprunt ? emprunt.dateEmprunt|date('d/m/Y') : 'Non définie' }}</td>
+                    <td>{{ emprunt.dateRetour ? emprunt.dateRetour|date('d/m/Y') : 'Non définie' }}</td>
+                    <td>
+                        {% if emprunt.statutEmprunt == 'Emprunté' %}
+                            <span class="status-emprunte">Emprunté</span>
+                        {% elseif emprunt.statutEmprunt == 'Retourné' %}
+                            <span class="status-retourne">Retourné</span>
+                        {% elseif emprunt.statutEmprunt == 'En retard' %}
+                            <span class="status-retard">En retard</span>
+                        {% else %}
+                            {{ emprunt.statutEmprunt ?: 'Non défini' }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">Aucun emprunt trouvé</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="footer">
+        <p>Document généré automatiquement par l'application RackeTech</p>
+        <p>© {{ 'now'|date('Y') }} RackeTech - Tous droits réservés</p>
+    </div>
+</body>
+</html> 

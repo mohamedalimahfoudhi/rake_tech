@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques des Emprunts, Maintenances et Matériels{% endblock %}
+
+{% block body %}
+    <h1>Statistiques des Emprunts, Maintenances et Matériels</h1>
+
+    <div style="margin-top: 30px;">
+        <h2>Emprunts par date</h2>
+        <p>Ce graphique montre le nombre d'emprunts effectués chaque jour. Il vous permet de visualiser l'activité des emprunts sur une période donnée.</p>
+        <div id="emprunt_chart_div" style="height: 400px;"></div>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <h2>Maintenances par date</h2>
+        <p>Ce graphique montre le nombre de maintenances effectuées chaque jour. Il permet de suivre les actions de maintenance sur les matériels au fil du temps.</p>
+        <div id="maintenance_chart_div" style="height: 400px;"></div>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <h2>Statut des Matériels</h2>
+        <p>Ce graphique montre la répartition des matériels selon leur statut actuel : "Disponible", "Réservé" ou "Sous maintenance". Cela permet de savoir l'état actuel des matériels dans le système.</p>
+        <div id="materiel_chart_div" style="height: 400px;"></div>
+    </div>
+
+<script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart', 'bar']});
+    google.charts.setOnLoadCallback(drawCharts);
+
+    function drawCharts() {
+        // Données pour le graphique des emprunts
+        var empruntData = {{ empruntData|json_encode()|raw }};
+        var empruntChartData = new google.visualization.DataTable();
+        empruntChartData.addColumn('string', 'Date');
+        empruntChartData.addColumn('number', 'Emprunts');
+        Object.keys(empruntData).forEach(function(date) {
+            empruntChartData.addRow([date, empruntData[date]]);
+        });
+
+        // Données pour le graphique des maintenances
+        var maintenanceData = {{ maintenanceData|json_encode()|raw }};
+        var maintenanceChartData = new google.visualization.DataTable();
+        maintenanceChartData.addColumn('string', 'Date');
+        maintenanceChartData.addColumn('number', 'Maintenances');
+        Object.keys(maintenanceData).forEach(function(date) {
+            maintenanceChartData.addRow([date, maintenanceData[date]]);
+        });
+
+        // Données pour le graphique des matériels
+        var materielsData = {{ materielsData|json_encode()|raw }};
+        var materielsChartData = new google.visualization.DataTable();
+        materielsChartData.addColumn('string', 'Statut');
+        materielsChartData.addColumn('number', 'Count');
+        Object.keys(materielsData).forEach(function(key) {
+            materielsChartData.addRow([key, materielsData[key]]);
+        });
+
+        // Graphique des emprunts
+        var empruntChart = new google.visualization.ColumnChart(document.getElementById('emprunt_chart_div'));
+        empruntChart.draw(empruntChartData, {
+            title: 'Nombre d\'emprunts par date',
+            hAxis: {title: 'Date'},
+            vAxis: {title: 'Nombre d\'emprunts'},
+            legend: { position: 'none' }
+        });
+
+        // Graphique des maintenances
+        var maintenanceChart = new google.visualization.ColumnChart(document.getElementById('maintenance_chart_div'));
+        maintenanceChart.draw(maintenanceChartData, {
+            title: 'Nombre de maintenances par date',
+            hAxis: {title: 'Date'},
+            vAxis: {title: 'Nombre de maintenances'},
+            legend: { position: 'none' }
+        });
+
+        // Graphique des matériels
+        var materielsChart = new google.visualization.PieChart(document.getElementById('materiel_chart_div'));
+        materielsChart.draw(materielsChartData, {
+            title: 'Répartition des matériels selon leur statut',
+            slices: {
+                0: { offset: 0.1 }, // "Disponible"
+                1: { offset: 0.1 }, // "Réservé"
+                2: { offset: 0.1 }  // "Sous maintenance"
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{{ form_start(form) }}
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            {{ form_label(form.dateemprunt) }}
+            {{ form_widget(form.dateemprunt, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.dateemprunt) }}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            {{ form_label(form.dateretour) }}
+            {{ form_widget(form.dateretour, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.dateretour) }}
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+
+                            <div class="col-md-6 mb-3">
+                  {{ form_widget(form.statutemprunt, {
+    'attr': {'class': 'form-select'}
+}) }}
+        
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            {{ form_label(form.userid) }}
+            {{ form_widget(form.userid, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.userid) }}
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            {{ form_label(form.materielid) }}
+            {{ form_widget(form.materielid, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.materielid) }}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+    <a href="{{ path('app_emprunt_index') }}" class="btn btn-secondary">Retour à la liste</a>
+</div>
+{{ form_end(form) }} 
