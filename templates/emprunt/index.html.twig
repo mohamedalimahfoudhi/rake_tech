@@ -60,6 +60,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link  " href="{{ path('app_maintenance_index') }}">
+                                <i class="fas fa-users"></i> Maintenance Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <i class="fas fa-cog"></i> Settings
                             </a>
@@ -84,7 +89,9 @@
                     <h1 class="h2">Emprunts Management</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                            <a href="{{ path('app_emprunt_export_pdf') }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </a>
                         </div>
                         <div class="btn-group me-2">
                             <a href="{{ path('app_emprunt_new') }}" class="btn btn-primary">

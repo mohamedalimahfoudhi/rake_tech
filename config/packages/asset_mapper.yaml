@@ -3,7 +3,12 @@ framework:
         # The paths to make available to the asset mapper.
         paths:
             - assets/
+        enabled: true
         missing_import_mode: strict
+        excluded_patterns:
+            - '**/*.map'
+            - '*/assets/build/*'
+        
 
 when@prod:
     framework:

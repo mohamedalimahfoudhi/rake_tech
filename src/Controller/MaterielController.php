@@ -13,6 +13,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
 use App\Entity\Emprunt;
 use Symfony\Component\Security\Core\Security;
+use Pagerfanta\Pagerfanta;
+use Pagerfanta\Adapter\DoctrineORMAdapter;
+use App\Pagination\CustomDoctrineORMAdapter;
+use App\Entity\Maintenance;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class MaterielController extends AbstractController
 {
@@ -24,19 +30,102 @@ class MaterielController extends AbstractController
     }
 
     #[Route('/admin/materiel/', name: 'app_materiel_index', methods: ['GET'])]
-    public function index(MaterielRepository $materielRepository): Response
+    public function index(MaterielRepository $materielRepository, Request $request): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        try {
+        
+        // Get the current page (default to page 1)
+        $page = $request->query->getInt('page', 1);
+        
+        // Get the status filter (if any)
+        $statusFilter = $request->query->get('status');
+        
+        // Get counts for each status
+        $disponibleCount = $materielRepository->count(['statut' => 'Disponible']);
+        $reserveCount = $materielRepository->count(['statut' => 'Réservé']);
+        $maintenanceCount = $materielRepository->count(['statut' => 'Sous maintenance']);
+        $totalCount = $materielRepository->count([]);
+        
+        // Create the query builder for fetching materials
+        $queryBuilder = $materielRepository->createQueryBuilder('m')
+            ->orderBy('m.type', 'ASC');
+        
+        // Apply status filter if provided
+        if ($statusFilter && in_array($statusFilter, ['Disponible', 'Réservé', 'Sous maintenance'])) {
+            $queryBuilder->andWhere('m.statut = :status')
+                ->setParameter('status', $statusFilter);
+        }
+        
+        // Create a Doctrine ORM Adapter
+        $adapter = new CustomDoctrineORMAdapter($queryBuilder);
+        
+        // Create Pagerfanta instance
+        $pagerfanta = new Pagerfanta($adapter);
+        $pagerfanta->setMaxPerPage(3);
+        $pagerfanta->setCurrentPage($page);
+        
         return $this->render('materiel/index.html.twig', [
-            'materiels' => $materielRepository->findAll(),
-        ]);}catch (\Exception $e) {
-            $this->logger->error('Error fetching users', [
+            'pager' => $pagerfanta,
+            'statusFilter' => $statusFilter,
+            'disponibleCount' => $disponibleCount,
+            'reserveCount' => $reserveCount,
+            'maintenanceCount' => $maintenanceCount,
+            'totalCount' => $totalCount,
+        ]);
+    }
+    
+    #[Route('/admin/materiel/export-pdf', name: 'app_materiel_export_pdf', methods: ['GET'])]
+    public function exportToPdf(MaterielRepository $materielRepository): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        
+        try {
+            // Get all materials
+            $materiels = $materielRepository->findAll();
+            
+            // Configure Dompdf
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isRemoteEnabled', true);
+            
+            // Instantiate Dompdf
+            $dompdf = new Dompdf($options);
+            
+            // Generate HTML for PDF
+            $html = $this->renderView('materiel/pdf_export.html.twig', [
+                'materiels' => $materiels,
+                'date' => new \DateTime(),
+            ]);
+            
+            // Load HTML to Dompdf
+            $dompdf->loadHtml($html);
+            
+            // Set paper size and orientation
+            $dompdf->setPaper('A4', 'portrait');
+            
+            // Render the PDF
+            $dompdf->render();
+            
+            // Generate a filename
+            $filename = 'export_materiels_' . date('Y-m-d_H-i-s') . '.pdf';
+            
+            // Output the generated PDF (inline)
+            return new Response(
+                $dompdf->output(),
+                Response::HTTP_OK,
+                [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                ]
+            );
+            
+        } catch (\Exception $e) {
+            $this->logger->error('Error exporting PDF', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            $this->addFlash('error', 'An error occurred while fetching users.');
-            return $this->redirectToRoute('app_dashboard');
+            $this->addFlash('error', 'An error occurred while generating the PDF export.');
+            return $this->redirectToRoute('app_materiel_index');
         }
     }
 
@@ -245,4 +334,61 @@ class MaterielController extends AbstractController
             return $this->redirectToRoute('app_dashboard');
         }
     }
+
+    #[Route('/athlete/signalerpanne/{materielId}', name: 'signaler_panne')]
+    public function signalerPanne($materielId, EntityManagerInterface $em, Security $security)
+    {
+    $this->denyAccessUnlessGranted('ROLE_ATHLETE');
+
+    try {
+        // Récupérer l'utilisateur connecté
+        $user = $security->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Récupérer le matériel correspondant à l'ID
+        $materiel = $em->getRepository(Materiel::class)->find($materielId);
+        if (!$materiel) {
+            $this->addFlash('error', 'Matériel introuvable.');
+            return $this->redirectToRoute('mes_materiels_athlete');
+        }
+
+        // Mettre à jour le statut du matériel
+        $materiel->setStatut('Sous maintenance');
+        $materiel->setSignaler(1);
+        $em->persist($materiel);
+
+        // Mettre à jour l'emprunt associé
+        $emprunt = $em->getRepository(Emprunt::class)->findOneBy(['materielid' => $materiel, 'userid' => $user]);
+        if ($emprunt) {
+            $emprunt->setStatutEmprunt('Emprunté');
+            $em->persist($emprunt);
+        }
+
+        // Créer une nouvelle maintenance
+        $maintenance = new Maintenance();
+        $maintenance->setMaterielid($materiel);
+        $maintenance->setDateMaintenance(new \DateTime());
+        $maintenance->setStatutMaintenance('Planifié');
+        $maintenance->setDescription('Maintenance automatique');
+        $em->persist($maintenance);
+
+        // Enregistrer toutes les modifications
+        $em->flush();
+
+        $this->addFlash('success', 'Le matériel a été signalé comme étant en panne.');
+
+        return $this->redirectToRoute('mes_materiels_athlete');
+
+        } catch (\Exception $e) {
+        $this->logger->error('Error reporting panne', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        $this->addFlash('error', 'An error occurred while reporting the panne.');
+        return $this->redirectToRoute('mes_materiels_athlete');
+        }
+        }
+
 } 

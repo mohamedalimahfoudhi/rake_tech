@@ -59,6 +59,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link  " href="{{ path('app_maintenance_index') }}">
+                                <i class="fas fa-users"></i> Maintenance Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <i class="fas fa-cog"></i> Settings
                             </a>
@@ -83,16 +88,15 @@
                     <h1 class="h2">Materiels Management</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                            <a href="{{ path('app_materiel_export_pdf') }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </a>
                         </div>
                         <div class="btn-group me-2">
                             <a href="{{ path('app_materiel_new') }}" class="btn btn-primary">
                             <i class="fas fa-plus"></i> Nouvel Materiel
                             </a>                        
                         </div>
-
-
-
                     </div>
                 </div>
 
@@ -110,14 +114,65 @@
                     </div>
                 {% endfor %}
 
-
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Emprunts</h5>
+                        <h5 class="card-title mb-0">Liste des Materiels</h5>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
+                    
+                    <!-- Status Counts -->
+                    <div class="mb-3">
+                        <a href="{{ path('app_materiel_index') }}" class="badge {% if not statusFilter %}bg-dark{% else %}bg-secondary{% endif %} text-decoration-none">
+                            Tous <span class="badge bg-light text-dark">{{ totalCount }}</span>
+                        </a>
+                        <a href="{{ path('app_materiel_index', {status: 'Disponible'}) }}" class="badge {% if statusFilter == 'Disponible' %}bg-success{% else %}bg-secondary{% endif %} text-decoration-none">
+                            Disponible <span class="badge bg-light text-dark">{{ disponibleCount }}</span>
+                        </a>
+                        <a href="{{ path('app_materiel_index', {status: 'Réservé'}) }}" class="badge {% if statusFilter == 'Réservé' %}bg-warning{% else %}bg-secondary{% endif %} text-decoration-none">
+                            Réservé <span class="badge bg-light text-dark">{{ reserveCount }}</span>
+                        </a>
+                        <a href="{{ path('app_materiel_index', {status: 'Sous maintenance'}) }}" class="badge {% if statusFilter == 'Sous maintenance' %}bg-danger{% else %}bg-secondary{% endif %} text-decoration-none">
+                            En maintenance <span class="badge bg-light text-dark">{{ maintenanceCount }}</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Status Filter -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <form action="{{ path('app_materiel_index') }}" method="get" class="d-flex">
+                                <select name="status" class="form-select me-2" onchange="this.form.submit()">
+                                    <option value="">Tous les statuts</option>
+                                    <option value="Disponible" {% if statusFilter == 'Disponible' %}selected{% endif %}>Disponible</option>
+                                    <option value="Réservé" {% if statusFilter == 'Réservé' %}selected{% endif %}>Réservé</option>
+                                    <option value="Sous maintenance" {% if statusFilter == 'Sous maintenance' %}selected{% endif %}>Sous maintenance</option>
+                                </select>
+                                {% if statusFilter %}
+                                    <a href="{{ path('app_materiel_index') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Réinitialiser
+                                    </a>
+                                {% endif %}
+                            </form>
+                        </div>
+                        {% if statusFilter %}
+                        <div class="col-md-8">
+                            <div class="alert alert-info py-2 mb-0">
+                                <i class="fas fa-filter"></i> 
+                                Filtrage par statut: <strong>
+                                {% if statusFilter == 'Disponible' %}
+                                    <span class="text-success">Disponible</span>
+                                {% elseif statusFilter == 'Réservé' %}
+                                    <span class="text-warning">Réservé</span>
+                                {% elseif statusFilter == 'Sous maintenance' %}
+                                    <span class="text-danger">En maintenance</span>
+                                {% endif %}
+                                </strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="table-responsive">
+                    <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th>Type</th>
@@ -130,55 +185,68 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% for materiel in materiels %}
-                            <tr>
-                                <td>{{ materiel.type }}</td>
-                                <td>{{ materiel.typesport }}</td>
-                                <td>{{ materiel.prix|number_format(2, ',', ' ') }} €</td>
-                                <td>{{ materiel.datereservation ? materiel.datereservation|date('d/m/Y H:i') : 'Non définie' }}</td>
-                                <td>
-                                    {% if materiel.statut == 'Disponible' %}
-                                        <span class="badge bg-success">Disponible</span>
-                                    {% elseif materiel.statut == 'Réservé' %}
-                                        <span class="badge bg-warning">Réservé</span>
-                                    {% else %}
-                                        <span class="badge bg-danger">En maintenance</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if materiel.ownertype == 'club' %}
-                                        <span class="badge bg-primary">Club</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">Autre</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="{{ path('app_materiel_show', {'id': materiel.id}) }}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ path('app_materiel_edit', {'id': materiel.id}) }}" class="btn btn-sm btn-warning">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                         <form method="post" action="{{ path('app_materiel_delete', {'id': materiel.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce materiel ?');" style="display: inline;">
+                            {% for materiel in pager.getIterator() %}
+                                <tr>
+                                    <td>{{ materiel.type }}</td>
+                                    <td>{{ materiel.typesport }}</td>
+                                    <td>{{ materiel.prix|number_format(2, ',', ' ') }} €</td>
+                                    <td>{{ materiel.datereservation ? materiel.datereservation|date('d/m/Y H:i') : 'Non définie' }}</td>
+                                    <td>
+                                        {% if materiel.statut == 'Disponible' %}
+                                            <span class="badge bg-success">Disponible</span>
+                                        {% elseif materiel.statut == 'Réservé' %}
+                                            <span class="badge bg-warning">Réservé</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">En maintenance</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if materiel.ownertype == 'Club' %}
+                                            <span class="badge bg-primary">Club</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Autre</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ path('app_materiel_show', {'id': materiel.id}) }}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ path('app_materiel_edit', {'id': materiel.id}) }}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('app_materiel_delete', {'id': materiel.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce materiel ?');" style="display: inline;">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ materiel.id) }}">
                                                 <button class="btn btn-danger btn-sm">
                                                     <i class="ri-delete-bin-line"></i>
                                                 </button>
                                             </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="7" class="text-center">Aucun matériel trouvé</td>
-                            </tr>
-                        {% endfor %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center">Aucun matériel trouvé</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
-            </div>
+
+                {# Pagination controls #}
+                <div class="pagination">
+                    <span>Page {{ pager.getCurrentPage() }} sur {{ pager.getNbPages() }}</span>
+                    <div class="pagination-controls">
+                        {% if pager.hasPreviousPage() %}
+                            <a href="{{ path('app_materiel_index', { page: pager.getPreviousPage(), status: statusFilter }) }}" class="btn btn-sm btn-outline-secondary">Précédent</a>
+                        {% endif %}
+                        {% if pager.hasNextPage() %}
+                            <a href="{{ path('app_materiel_index', { page: pager.getNextPage(), status: statusFilter }) }}" class="btn btn-sm btn-outline-secondary">Suivant</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </main>
         </div>
     </div>
 {% endblock %}
-

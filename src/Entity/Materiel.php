@@ -51,6 +51,9 @@ class Materiel
     #[Assert\Choice(choices: ['Club', 'Fédération', 'Privé'], message: 'Le type de propriétaire doit être "Club", "Fédération", "Privé"')]
     private $ownertype = null;
 
+    #[ORM\Column( nullable: true)]
+    private ?int $signaler = 0;
+
     // Getters
     public function getId(): ?int
     {
@@ -65,6 +68,10 @@ class Materiel
     public function getTypeSport(): ?string
     {
         return $this->typesport;
+    }
+    public function getSignaler(): ?int
+    {
+        return $this->signaler;
     }
 
     public function getPrix(): ?float
@@ -155,5 +162,11 @@ class Materiel
     public function isEnMaintenance(): bool
     {
         return $this->statut === 'maintenance';
+    }
+
+    public function setSignaler(?int $signaler): self
+    {
+         $this->signaler = $signaler;
+         return $this;
     }
 }

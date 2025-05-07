@@ -9,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType; // Ajoutez cette ligne
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -42,7 +43,11 @@ class MaintenanceType extends AbstractType
                 'required' => true,
                 'placeholder' => 'Sélectionnez un matériel',
             ])
-        ;
+            // Ajoutez le bouton d'enregistrement
+            ->add('save', SubmitType::class, [
+                'label' => 'Enregistrer',
+                'attr' => ['class' => 'btn btn-primary'], // vous pouvez ajouter des classes Bootstrap ou personnaliser
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -51,4 +56,4 @@ class MaintenanceType extends AbstractType
             'data_class' => Maintenance::class,
         ]);
     }
-} 
+}

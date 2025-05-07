@@ -10,9 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 
-#[Route('/maintenance')]
+#[Route('/admin/maintenance')]
 class MaintenanceController extends AbstractController
 {
     #[Route('/', name: 'app_maintenance_index', methods: ['GET'])]
@@ -21,6 +23,57 @@ class MaintenanceController extends AbstractController
         return $this->render('maintenance/index.html.twig', [
             'maintenances' => $maintenanceRepository->findAll(),
         ]);
+    }
+
+    #[Route('/export-pdf', name: 'app_maintenance_export_pdf', methods: ['GET'])]
+    public function exportToPdf(MaintenanceRepository $maintenanceRepository): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        
+        try {
+            // Get all maintenance records
+            $maintenances = $maintenanceRepository->findAll();
+            
+            // Configure Dompdf
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isRemoteEnabled', true);
+            
+            // Instantiate Dompdf
+            $dompdf = new Dompdf($options);
+            
+            // Generate HTML for PDF
+            $html = $this->renderView('maintenance/pdf_export.html.twig', [
+                'maintenances' => $maintenances,
+                'date' => new \DateTime(),
+            ]);
+            
+            // Load HTML to Dompdf
+            $dompdf->loadHtml($html);
+            
+            // Set paper size and orientation
+            $dompdf->setPaper('A4', 'portrait');
+            
+            // Render the PDF
+            $dompdf->render();
+            
+            // Generate a filename
+            $filename = 'export_maintenances_' . date('Y-m-d_H-i-s') . '.pdf';
+            
+            // Output the generated PDF (inline)
+            return new Response(
+                $dompdf->output(),
+                Response::HTTP_OK,
+                [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                ]
+            );
+            
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'An error occurred while generating the PDF export.');
+            return $this->redirectToRoute('app_maintenance_index');
+        }
     }
 
     #[Route('/new', name: 'app_maintenance_new', methods: ['GET', 'POST'])]

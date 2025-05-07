@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class EmpruntController extends AbstractController
 {
@@ -27,17 +29,72 @@ class EmpruntController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         try {
-        return $this->render('emprunt/index.html.twig', [
-            'emprunts' => $empruntRepository->findAll(),
-        ]);
-    } catch (\Exception $e) {
-        $this->logger->error('Error fetching users', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        $this->addFlash('error', 'An error occurred while fetching users.');
-        return $this->redirectToRoute('app_dashboard');
+            return $this->render('emprunt/index.html.twig', [
+                'emprunts' => $empruntRepository->findAll(),
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('Error fetching users', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            $this->addFlash('error', 'An error occurred while fetching users.');
+            return $this->redirectToRoute('app_dashboard');
+        }
     }
+
+    #[Route('/admin/emprunt/export-pdf', name: 'app_emprunt_export_pdf', methods: ['GET'])]
+    public function exportToPdf(EmpruntRepository $empruntRepository): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        
+        try {
+            // Get all emprunts
+            $emprunts = $empruntRepository->findAll();
+            
+            // Configure Dompdf
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isRemoteEnabled', true);
+            
+            // Instantiate Dompdf
+            $dompdf = new Dompdf($options);
+            
+            // Generate HTML for PDF
+            $html = $this->renderView('emprunt/pdf_export.html.twig', [
+                'emprunts' => $emprunts,
+                'date' => new \DateTime(),
+            ]);
+            
+            // Load HTML to Dompdf
+            $dompdf->loadHtml($html);
+            
+            // Set paper size and orientation
+            $dompdf->setPaper('A4', 'portrait');
+            
+            // Render the PDF
+            $dompdf->render();
+            
+            // Generate a filename
+            $filename = 'export_emprunts_' . date('Y-m-d_H-i-s') . '.pdf';
+            
+            // Output the generated PDF (inline)
+            return new Response(
+                $dompdf->output(),
+                Response::HTTP_OK,
+                [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                ]
+            );
+            
+        } catch (\Exception $e) {
+            $this->logger->error('Error exporting PDF', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            $this->addFlash('error', 'An error occurred while generating the PDF export.');
+            return $this->redirectToRoute('app_emprunt_index');
+        }
     }
 
     #[Route('/admin/emprunt/new', name: 'app_emprunt_new', methods: ['GET', 'POST'])]
