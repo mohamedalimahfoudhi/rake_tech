@@ -7,13 +7,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Entity\Tournoi;
-use Doctrine\Common\Collections\Collection; // Correctly import the Collection interface
-use Doctrine\Common\Collections\ArrayCollection;
-
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'utilisateur')]
+#[UniqueEntity(fields: ['email'], message: 'This email is already registered')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -28,6 +26,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?string $motdepasse = null;
+    
+    /**
+     * @var string The plain password
+     */
+    private ?string $password = null;
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $genre = null;
@@ -54,14 +57,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'nomOrganisation', length: 255, nullable: true)]
     private ?string $nomOrganisation = null;
 
-    #[ORM\ManyToMany(targetEntity: 'App\Entity\Tournoi', mappedBy: 'participants')]
-    private Collection $tournois;
-
-    public function __construct()
-    {
-        $this->tournois = new ArrayCollection();  // Initialize as an ArrayCollection
-    }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -86,6 +81,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): self
     {
         $this->motdepasse = $password;
+        return $this;
+    }
+
+    public function getTempPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setTempPassword(?string $password): self
+    {
+        $this->password = $password;
         return $this;
     }
 
@@ -191,34 +197,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
     }
-
-
-    public function getTournois(): Collection
-    {
-        return $this->tournois;
-    }
-
-    public function addTournoi(Tournoi $tournoi): self
-    {
-        if (!$this->tournois->contains($tournoi)) {
-            $this->tournois[] = $tournoi;
-            $tournoi->addParticipant($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTournoi(Tournoi $tournoi): self
-    {
-        if ($this->tournois->removeElement($tournoi)) {
-            $tournoi->removeParticipant($this);
-        }
-
-        return $this;
-    }
-
-    public function __toString(): string
-{
-    return $this->nom ?? 'User Inconnu';
-}
 } 

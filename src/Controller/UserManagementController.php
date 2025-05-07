@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserManagementFormType;
 use App\Repository\UserRepository;
+use App\Repository\RoleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,31 +19,53 @@ use Psr\Log\LoggerInterface;
 class UserManagementController extends AbstractController
 {
     private $logger;
+    private $paginator;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, PaginatorInterface $paginator)
     {
         $this->logger = $logger;
+        $this->paginator = $paginator;
     }
 
-    #[Route('/admin/users', name: 'app_user_management')]
-    public function index(UserRepository $userRepository): Response
+    #[Route('/user-management', name: 'app_user_management')]
+    public function index(Request $request, UserRepository $userRepository, RoleRepository $roleRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $search = $request->query->get('search');
+        $selectedRole = $request->query->get('role');
         
-        try {
-            $users = $userRepository->findAll();
-            
-            return $this->render('user_management/index.html.twig', [
-                'users' => $users,
-            ]);
-        } catch (\Exception $e) {
-            $this->logger->error('Error fetching users', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            $this->addFlash('error', 'An error occurred while fetching users.');
-            return $this->redirectToRoute('app_dashboard');
+        // Get all roles for the filter dropdown
+        $roles = $roleRepository->findAll();
+        
+        // Create query builder
+        $qb = $userRepository->createQueryBuilder('u')
+            ->leftJoin('u.role', 'r')
+            ->orderBy('u.id', 'DESC');
+        
+        // Add search condition if search term exists
+        if ($search) {
+            $qb->andWhere('u.email LIKE :search OR u.nom LIKE :search OR u.prenom LIKE :search OR u.numeroTelephone LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
         }
+        
+        // Add role filter if role is selected
+        if ($selectedRole) {
+            $qb->andWhere('r.roleID = :roleId')
+               ->setParameter('roleId', $selectedRole);
+        }
+        
+        // Create pagination
+        $pagination = $this->paginator->paginate(
+            $qb,
+            $request->query->getInt('page', 1),
+            10 // items per page
+        );
+        
+        return $this->render('user_management/index.html.twig', [
+            'pagination' => $pagination,
+            'search' => $search,
+            'roles' => $roles,
+            'selected_role' => $selectedRole
+        ]);
     }
 
     #[Route('/admin/users/{id}/edit', name: 'app_user_edit')]
