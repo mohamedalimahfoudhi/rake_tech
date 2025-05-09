@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Terrain;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -15,6 +16,8 @@ class TerrainType extends AbstractType
         $builder
             ->add('name')
             ->add('location')
+            ->add('latitude', HiddenType::class)
+            ->add('longitude', HiddenType::class)
             ->add('courtType', ChoiceType::class, [
                 'choices'  => [
                     'Padel' => 'Padel',
@@ -31,7 +34,8 @@ class TerrainType extends AbstractType
                 ],
                 'required' => true,
                 'data' => 'Available',
-            ]);        ;
+            ]);   
+                 ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

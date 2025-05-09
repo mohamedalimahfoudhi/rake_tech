@@ -5,22 +5,24 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Form\EventType;
 use App\Repository\EventRepository;
+use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Twig\Environment;
 
 #[Route('/event')]
 final class EventController extends AbstractController
 {
-    #[Route('/fr',name: 'afr', methods: ['GET'])]
-    public function front(): Response
-    {
-        return $this->render('front.html.twig', [
-        ]);
-    }
+  //composer require dompdf/dompdf
+
+    #[Route(name: 'app_event_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository): Response
     {
         return $this->render('event/index.html.twig', [
@@ -32,6 +34,84 @@ final class EventController extends AbstractController
     {
         return $this->render('event/indexf.html.twig', [
             'events' => $eventRepository->findAll(),
+        ]);
+    }
+    #[Route('/front/{id}/review', name: 'app_event_reviewid', methods: ['GET'])]
+    public function calculateAverageRatingForEventByID($id, ReviewRepository $reviewRepository): JsonResponse
+    {
+        $reviews = $reviewRepository->findBy(['event' => $id]);
+        $averageRating = $this->calculateAverageRating($reviews);
+    
+        return new JsonResponse(['average' => round($averageRating, 1)]);
+    }
+    
+    private function calculateAverageRating($reviews): float
+    {
+        $totalRating = 0;
+        $reviewCount = count($reviews);
+    
+        foreach ($reviews as $review) {
+            $totalRating += $review->getRating();
+        }
+    
+        return $reviewCount > 0 ? $totalRating / $reviewCount : 0;
+    }
+    #[Route('/cal',name: 'cal', methods: ['GET'])]
+    public function calendrier(EventRepository $eventRepository): Response
+    {
+        return $this->render('event/calendar.html.twig', [
+            'events' => $eventRepository->findAll(),
+        ]);
+    }
+    #[Route('/calb',name: 'calb', methods: ['GET'])]
+    public function calendrierb(EventRepository $eventRepository): Response
+    {
+        return $this->render('event/calendarb.html.twig', [
+            'events' => $eventRepository->findAll(),
+        ]);
+    }
+    #[Route('/api/events', name: 'api_events')]
+    public function getEvents(EventRepository $eventRepository): JsonResponse
+    {
+        $events = $eventRepository->findAll();
+
+        $data = [];
+
+        foreach ($events as $event) {
+            $data[] = [
+                'id' => $event->getId(),
+                'title' => $event->getName(),
+                'start' => $event->getStartDate()->format('Y-m-d H:i:s'),
+                'end' => $event->getEndDate()->format('Y-m-d H:i:s'),
+            ];
+        }
+
+        return new JsonResponse($data);
+    }
+    #[Route('/event/pdf', name: 'event_pdf')]
+    public function generatePdf(Environment $twig,EventRepository $eventRepository): Response
+    {
+        $events = $eventRepository->findAll();
+        // Configuration Dompdf
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'Arial');
+        $dompdf = new Dompdf($options);
+
+        // Rendu HTML via Twig
+        $html = $twig->render('event/pdf.html.twig', [
+            'events' => $events
+        ]);
+
+        // Générer le PDF
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Retourner la réponse PDF
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="events.pdf"',
         ]);
     }
     #[Route('/new', name: 'app_event_new', methods: ['GET', 'POST'])]

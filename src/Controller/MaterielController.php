@@ -257,7 +257,7 @@ class MaterielController extends AbstractController
     {
         
         $this->denyAccessUnlessGranted('ROLE_ATHLETE');
-        try {
+      
         // Vérifier si l'utilisateur est connecté
         $user = $this->getUser();
         if (!$user) {
@@ -270,7 +270,7 @@ class MaterielController extends AbstractController
         if (!$materiel || $materiel->getStatut() !== 'Disponible') {
             // Vérifier si le matériel est disponible
             $this->addFlash('error', 'Le matériel n\'est pas disponible');
-            return $this->redirectToRoute('materiels');
+            return $this->redirectToRoute('mes_materiels_athlete');
         }
 
         // Créer un nouvel emprunt
@@ -294,15 +294,8 @@ class MaterielController extends AbstractController
         // Message de confirmation
         $this->addFlash('success', 'Le matériel a été réservé avec succès.');
 
-        return $this->redirectToRoute('materiels');
-        }catch (\Exception $e) {
-            $this->logger->error('Error fetching users', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            $this->addFlash('error', 'An error occurred while fetching users.');
-            return $this->redirectToRoute('app_dashboard');
-        }
+        return $this->redirectToRoute('mes_materiels_athlete');
+        
     }
 
 

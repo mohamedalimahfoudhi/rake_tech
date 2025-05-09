@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Security;
 use App\Entity\Reservation;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Psr\Log\LoggerInterface;
 use Endroid\QrCode\QrCode;
@@ -28,43 +29,42 @@ final class TournoiController extends AbstractController
     {
         $this->security = $security;
         $this->logger = $logger;
-
     }
 
     #[Route('/admin/tournoi/', name: 'app_tournoi_index', methods: ['GET'])]
     public function index(EntityManagerInterface $entityManager, Request $request): Response
-        {
-            $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-            try {
-                // Get the selected statut from the request query parameters (optional)
-                $statutFilter = $request->query->get('statut'); 
+        try {
+            // Get the selected statut from the request query parameters (optional)
+            $statutFilter = $request->query->get('statut');
 
-                // Build the query to filter based on statut if it's set
-                $queryBuilder = $entityManager->getRepository(Tournoi::class)->createQueryBuilder('t');
+            // Build the query to filter based on statut if it's set
+            $queryBuilder = $entityManager->getRepository(Tournoi::class)->createQueryBuilder('t');
 
-                if ($statutFilter) {
-                    // Filter by statut if provided
-                    $queryBuilder->where('t.statut = :statut')
-                                ->setParameter('statut', $statutFilter);
-                }
-
-                // Execute the query
-                $tournois = $queryBuilder->getQuery()->getResult();
-
-                return $this->render('tournoi/index.html.twig', [
-                    'tournois' => $tournois,
-                    'statutFilter' => $statutFilter,  // To keep track of the current filter
-                ]);
-            } catch (\Exception $e) {
-                $this->logger->error('Error fetching tournois', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-                $this->addFlash('error', 'An error occurred while fetching tournois.');
-                return $this->redirectToRoute('app_dashboard');
+            if ($statutFilter) {
+                // Filter by statut if provided
+                $queryBuilder->where('t.statut = :statut')
+                    ->setParameter('statut', $statutFilter);
             }
+
+            // Execute the query
+            $tournois = $queryBuilder->getQuery()->getResult();
+
+            return $this->render('tournoi/index.html.twig', [
+                'tournois' => $tournois,
+                'statutFilter' => $statutFilter,  // To keep track of the current filter
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('Error fetching tournois', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            $this->addFlash('error', 'An error occurred while fetching tournois.');
+            return $this->redirectToRoute('app_dashboard');
         }
+    }
 
 
     #[Route('/admin/tournoi/new', name: 'app_tournoi_new', methods: ['GET', 'POST'])]
@@ -72,21 +72,22 @@ final class TournoiController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         try {
-        $tournoi = new Tournoi();
-        $form = $this->createForm(TournoiType::class, $tournoi);
-        $form->handleRequest($request);
+            $tournoi = new Tournoi();
+            $form = $this->createForm(TournoiType::class, $tournoi);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($tournoi);
-            $entityManager->flush();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->persist($tournoi);
+                $entityManager->flush();
 
-            return $this->redirectToRoute('app_tournoi_index', [], Response::HTTP_SEE_OTHER);
-        }
+                return $this->redirectToRoute('app_tournoi_index', [], Response::HTTP_SEE_OTHER);
+            }
 
-        return $this->render('tournoi/new.html.twig', [
-            'tournoi' => $tournoi,
-            'form' => $form,
-        ]);}catch (\Exception $e) {
+            return $this->render('tournoi/new.html.twig', [
+                'tournoi' => $tournoi,
+                'form' => $form,
+            ]);
+        } catch (\Exception $e) {
             $this->logger->error('Error fetching users', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -101,17 +102,17 @@ final class TournoiController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         try {
-        return $this->render('tournoi/show.html.twig', [
-            'tournoi' => $tournoi,
-        ]);
-    }catch (\Exception $e) {
-        $this->logger->error('Error fetching users', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        $this->addFlash('error', 'An error occurred while fetching users.');
-        return $this->redirectToRoute('app_dashboard');
-    }
+            return $this->render('tournoi/show.html.twig', [
+                'tournoi' => $tournoi,
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('Error fetching users', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            $this->addFlash('error', 'An error occurred while fetching users.');
+            return $this->redirectToRoute('app_dashboard');
+        }
     }
 
     #[Route('/admin/tournoi/{id}/edit', name: 'app_tournoi_edit', methods: ['GET', 'POST'])]
@@ -119,19 +120,20 @@ final class TournoiController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         try {
-        $form = $this->createForm(TournoiType::class, $tournoi);
-        $form->handleRequest($request);
+            $form = $this->createForm(TournoiType::class, $tournoi);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->flush();
 
-            return $this->redirectToRoute('app_tournoi_index', [], Response::HTTP_SEE_OTHER);
-        }
+                return $this->redirectToRoute('app_tournoi_index', [], Response::HTTP_SEE_OTHER);
+            }
 
-        return $this->render('tournoi/edit.html.twig', [
-            'tournoi' => $tournoi,
-            'form' => $form,
-        ]);}catch (\Exception $e) {
+            return $this->render('tournoi/edit.html.twig', [
+                'tournoi' => $tournoi,
+                'form' => $form,
+            ]);
+        } catch (\Exception $e) {
             $this->logger->error('Error fetching users', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -146,19 +148,22 @@ final class TournoiController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         try {
-        if ($this->isCsrfTokenValid('delete'.$tournoi->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($tournoi);
-            $entityManager->flush();
-        }
+            if ($this->isCsrfTokenValid('delete' . $tournoi->getId(), $request->getPayload()->getString('_token'))) {
+        
 
-        return $this->redirectToRoute('app_tournoi_index', [], Response::HTTP_SEE_OTHER);}catch (\Exception $e) {
-            $this->logger->error('Error fetching users', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            $this->addFlash('error', 'An error occurred while fetching users.');
-            return $this->redirectToRoute('app_dashboard');
-        }
+                $entityManager->remove($tournoi);
+                $entityManager->flush();
+
+            }
+
+            return $this->redirectToRoute('app_tournoi_index', [], Response::HTTP_SEE_OTHER);
+     } catch (\Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException $e) {
+        $this->addFlash('error', 'Impossible de supprimer ce tournoi car des réservations y sont associées. Supprimez d\'abord les réservations.');
+    } catch (\Exception $e) {
+        $this->addFlash('error', 'Une erreur inattendue est survenue lors de la suppression.');
+    }
+
+    return $this->redirectToRoute('app_tournoi_index', [], Response::HTTP_SEE_OTHER);
     }
 
 
@@ -167,39 +172,40 @@ final class TournoiController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ATHLETE');
         try {
-        // Get the current date and time
-        $now = new \DateTime();
+            // Get the current date and time
+            $now = new \DateTime();
 
-        // Fetch upcoming tournaments (where the start date is in the future)
-        $tournois = $entityManager->getRepository(Tournoi::class)
-            ->createQueryBuilder('t')
-            ->where('t.datedebut > :now')
-            ->setParameter('now', $now)
-            ->getQuery()
-            ->getResult();
+            // Fetch upcoming tournaments (where the start date is in the future)
+            $tournois = $entityManager->getRepository(Tournoi::class)
+                ->createQueryBuilder('t')
+                ->where('t.datedebut > :now')
+                ->setParameter('now', $now)
+                ->getQuery()
+                ->getResult();
 
-        // Get the current authenticated user
-        $user = $this->getUser();
+            // Get the current authenticated user
+            $user = $this->getUser();
 
-        // Fetch tournaments the current user is participating in
-        $participatingTournaments = $entityManager->getRepository(Tournoi::class)
-            ->createQueryBuilder('t')
-            ->join('t.participants', 'p')
-            ->where('p = :user') // Join the participants relation
-            ->setParameter('user', $user)
-            ->getQuery()
-            ->getResult();
+            // Fetch tournaments the current user is participating in
+            $participatingTournaments = $entityManager->getRepository(Tournoi::class)
+                ->createQueryBuilder('t')
+                ->join('t.participants', 'p')
+                ->where('p = :user') // Join the participants relation
+                ->setParameter('user', $user)
+                ->getQuery()
+                ->getResult();
 
-        // Extract tournament IDs the user is participating in
-        $participatingTournamentIds = array_map(function ($tournoi) {
-            return $tournoi->getId();
-        }, $participatingTournaments);
+            // Extract tournament IDs the user is participating in
+            $participatingTournamentIds = array_map(function ($tournoi) {
+                return $tournoi->getId();
+            }, $participatingTournaments);
 
-        // Render the template and pass both the upcoming tournaments and the participating IDs
-        return $this->render('tournoi/upcoming.html.twig', [
-            'tournois' => $tournois,
-            'participatingTournamentIds' => $participatingTournamentIds,
-        ]);}catch (\Exception $e) {
+            // Render the template and pass both the upcoming tournaments and the participating IDs
+            return $this->render('tournoi/upcoming.html.twig', [
+                'tournois' => $tournois,
+                'participatingTournamentIds' => $participatingTournamentIds,
+            ]);
+        } catch (\Exception $e) {
             $this->logger->error('Error fetching users', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -214,77 +220,41 @@ final class TournoiController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ATHLETE');
         try {
-        $user = $security->getUser();
+            $user = $security->getUser();
 
-        // Vérifier si l'utilisateur est connecté
-        if (!$user) {
-            $this->addFlash('error', 'Vous devez être connecté pour vous inscrire à un tournoi.');
-            return $this->redirectToRoute('app_login'); // Rediriger vers la page de connexion
-        }
+            // Vérifier si l'utilisateur est connecté
+            if (!$user) {
+                $this->addFlash('error', 'Vous devez être connecté pour vous inscrire à un tournoi.');
+                return $this->redirectToRoute('app_login'); // Rediriger vers la page de connexion
+            }
 
-        // Récupérer le tournoi
-        $tournoi = $entityManager->getRepository(Tournoi::class)->find($id);
-        if (!$tournoi || $tournoi->getStatut() !== 'Prévu') {
-            $this->addFlash('error', 'Le tournoi n\'est pas disponible pour l\'inscription.');
-            return $this->redirectToRoute('upcoming_tournaments'); // Rediriger vers la page des tournois à venir
-        }
+            // Récupérer le tournoi
+            $tournoi = $entityManager->getRepository(Tournoi::class)->find($id);
+            if (!$tournoi || $tournoi->getStatut() !== 'Prévu') {
+                $this->addFlash('error', 'Le tournoi n\'est pas disponible pour l\'inscription.');
+                return $this->redirectToRoute('upcoming_tournaments'); // Rediriger vers la page des tournois à venir
+            }
 
-        // Ajouter l'utilisateur en tant que participant au tournoi
-        $tournoi->addParticipant($user);  // Ensure the addParticipant method is defined in your Tournoi entity
+            // Ajouter l'utilisateur en tant que participant au tournoi
+            $tournoi->addParticipant($user);  // Ensure the addParticipant method is defined in your Tournoi entity
 
-        // Créer une réservation pour l'utilisateur et le tournoi
-        $reservation = new Reservation();
-        $reservation->setTournois($tournoi);
-        $reservation->setUtilisateurId($user);
-        $reservation->setDateReservation(new \DateTime());
-        $reservation->setStatut('Confirmée');
-        $reservation->setType(null); // Type null par défaut
+            // Créer une réservation pour l'utilisateur et le tournoi
+            $reservation = new Reservation();
+            $reservation->setTournois($tournoi);
+            $reservation->setUtilisateurId($user);
+            $reservation->setDateReservation(new \DateTime());
+            $reservation->setStatut('Confirmée');
+            $reservation->setType(null); // Type null par défaut
 
-        // Enregistrer la réservation et les modifications dans le tournoi
-        $entityManager->persist($reservation);
-        $entityManager->persist($tournoi); // Ensure the tournament's participants collection is persisted
-        $entityManager->flush();
+            // Enregistrer la réservation et les modifications dans le tournoi
+            $entityManager->persist($reservation);
+            $entityManager->persist($tournoi); // Ensure the tournament's participants collection is persisted
+            $entityManager->flush();
 
-        // Afficher un message de succès et rediriger vers la liste des tournois
-        $this->addFlash('success', 'Votre inscription au tournoi a été confirmée !');
-        return $this->redirectToRoute('app_tournoi_avenir'); // Rediriger vers la page des tournois à venir
-    }catch (\Exception $e) {
-        $this->logger->error('Error fetching users', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        $this->addFlash('error', 'An error occurred while fetching users.');
-        return $this->redirectToRoute('app_dashboard');
-    }}
-
-
-    #[Route('/athlete/mesreservations', name: 'mes_reservations')]
-    public function myReservations(EntityManagerInterface $entityManager, Security $security): Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_ATHLETE');
-        try {
-        // Récupérer l'utilisateur connecté
-        $user = $security->getUser();
-
-        if (!$user) {
-            $this->addFlash('error', 'Vous devez être connecté pour voir vos réservations.');
-            return $this->redirectToRoute('app_login'); // Rediriger vers la page de connexion
-        }
-
-        // Récupérer les réservations confirmées pour l'utilisateur
-        $reservations = $entityManager->getRepository(Reservation::class)
-            ->createQueryBuilder('r')
-            ->where('r.utilisateurid = :user')
-            ->andWhere('r.statut = :statut')
-            ->setParameter('user', $user)
-            ->setParameter('statut', 'Confirmée')
-            ->getQuery()
-            ->getResult();
-
-        // Passer les réservations à la vue
-        return $this->render('tournoi/my_reservations.html.twig', [
-            'reservations' => $reservations,
-        ]);}catch (\Exception $e) {
+            // Afficher un message de succès et rediriger vers la liste des tournois
+            $this->addFlash('success', 'Votre inscription au tournoi a été confirmée !');
+            return $this->redirectToRoute('app_tournoi_avenir'); // Rediriger vers la page des tournois à venir
+        } catch (\Exception $e) {
             $this->logger->error('Error fetching users', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -292,6 +262,36 @@ final class TournoiController extends AbstractController
             $this->addFlash('error', 'An error occurred while fetching users.');
             return $this->redirectToRoute('app_dashboard');
         }
+    }
+
+
+    #[Route('/athlete/mesreservations', name: 'mes_reservations')]
+    public function myReservations(EntityManagerInterface $entityManager, Security $security, UserRepository $userRepository): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ATHLETE');
+
+
+            // Récupérer l'utilisateur connecté
+            $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+            if (!$user) {
+                $this->addFlash('error', 'Vous devez être connecté pour voir vos réservations.');
+                return $this->redirectToRoute('app_login'); // Rediriger vers la page de connexion
+            }
+
+            // Récupérer les réservations confirmées pour l'utilisateur
+            $reservations = $entityManager->getRepository(Reservation::class)
+                ->createQueryBuilder('r')
+                ->where('r.utilisateurid = :user')
+                ->andWhere('r.statut = :statut')
+                ->setParameter('user', $user)
+                ->setParameter('statut', 'Confirmée')
+                ->getQuery()
+                ->getResult();
+            // Passer les réservations à la vue
+            return $this->render('tournoi/my_reservations.html.twig', [
+                'reservations' => $reservations,
+            ]);
+       
     }
 
 

@@ -158,7 +158,9 @@ class RegistrationFormType extends AbstractType
                 'choice_label' => 'roleNom',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('r')
-                        ->orderBy('r.roleNom', 'ASC');
+            ->where('r.roleNom != :admin')
+            ->setParameter('admin', 'ADMIN')
+            ->orderBy('r.roleNom', 'ASC');
                 },
                 'constraints' => [
                     new NotNull([

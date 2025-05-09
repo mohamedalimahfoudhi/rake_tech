@@ -1,41 +1,79 @@
-{% extends 'front.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Event index{% endblock %}
 
 {% block body %}
-    <h1>Event index</h1>
+<h1 class="text-center my-4">Event index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Details</th>
-                <th>Name</th>
-                <th>StartDate</th>
-                <th>EndDate</th>
-                <th>Reward</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<div class="container">
+    <div class="row">
         {% for event in events %}
-            <tr>
-                <td>{{ event.id }}</td>
-                <td>{{ event.details }}</td>
-                <td>{{ event.name }}</td>
-                <td>{{ event.startDate ? event.startDate|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ event.endDate ? event.endDate|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ event.reward }}</td>
-                <td>
-                    <a href="{{ path('app_event_showf', {'id': event.id}) }}">show</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border"> {# <-- Border added here #} <div
+                    class="card-body d-flex flex-column justify-content-between">
+                    <h5 class="card-title text-primary">{{ event.name }}</h5>
+                    <p class="card-text"><strong>Details:</strong> {{ event.details }}</p>
+                    <p class="card-text"><strong>Start:</strong> {{ event.startDate ? event.startDate|date('Y-m-d
+                        H:i:s') : 'N/A' }}</p>
+                    <p class="card-text"><strong>End:</strong> {{ event.endDate ? event.endDate|date('Y-m-d H:i:s') :
+                        'N/A' }}</p>
+                    <p class="card-text"><strong>Reward:</strong> {{ event.reward }}</p>
+                    <p class="card-text"><strong>Global Rating:</strong>
+                    <div id="rating-{{ event.id }}" class="text-warning mb-2"></div>
+                    </p>
+
+                    <a href="{{ path('app_event_showf', {'id': event.id}) }}"
+                        class="btn btn-sm btn-outline-secondary mb-1">Show</a>
+                   <!--a href="{{ path('event_review', {'id': event.id}) }}"
+                        class="btn btn-sm btn-outline-primary">Ajouter un avis</a-->
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <p class="text-center">No records found</p>
+    </div>
+    {% endfor %}
+</div>
+</div>
+
+
+<hr class="my-5">
+
+<div id='calendar'></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const eventIds = {{ events| map(e => e.id) | json_encode | raw
+    }};
+
+    eventIds.forEach(id => {
+        fetch(`/event/front/${id}/review`)
+            .then(response => response.json())
+            .then(data => {
+                const avg = Math.round(data.average);
+                const container = document.getElementById(`rating-${id}`);
+                if (container) {
+                    let starsHtml = '';
+                    for (let i = 1; i <= 5; i++) {
+                        starsHtml += `<i class="bi ${i <= avg ? 'bi-star-fill' : 'bi-star'}"></i>`;
+                    }
+                    container.innerHTML = starsHtml;
+                }
+            });
+    });
+
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: '/event/api/events',
+    });
+    calendar.render();
+    });
+</script>
 
 {% endblock %}

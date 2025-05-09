@@ -1,0 +1,172 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<!-- Bootstrap Icons pour les étoiles -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+	<style>
+		/* Style général du body */
+		body {
+			background: #f8f9fa;
+			font-family: 'Segoe UI', sans-serif;
+		}
+
+		/* Conteneur centré */
+		.review-container {
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 2rem;
+		}
+
+		/* Carte principale */
+		.card-review {
+			width: 100%;
+			max-width: 600px;
+			border-radius: 1rem;
+			box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+			background: white;
+			padding: 2rem;
+		}
+
+		/* Étoiles de notation */
+		.star-rating {
+			font-size: 2rem;
+			color: #ccc;
+			cursor: pointer;
+		}
+
+		/* Étoiles sélectionnées ou survolées */
+		.star-rating .bi-star-fill.selected,
+		.star-rating .bi-star-fill.hovered {
+			color: #ffc107;
+			transform: scale(1.1);
+		}
+
+		/* Avis individuel */
+		.card-avis {
+			background: #fff;
+			border-radius: 0.75rem;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+			padding: 1rem 1.5rem;
+			margin-bottom: 1rem;
+		}
+
+		/* Scrollable container si plus de 4 avis */
+		.reviews-scroll {
+			max-height: 250px;
+			overflow-y: auto;
+			padding-right: 0.5rem;
+		}
+
+		/* Scroll stylisé */
+		.reviews-scroll::-webkit-scrollbar {
+			width: 8px;
+		}
+		.reviews-scroll::-webkit-scrollbar-thumb {
+			background-color: rgba(0, 0, 0, 0.1);
+			border-radius: 3px;
+		}
+	</style>
+
+	<div class="review-container">
+		<div class="card-review">
+			<h4 class="text-center mb-3">Laissez un avis pour
+				<strong>{{ event.name }}</strong>
+			</h4>
+
+			<!-- Étoiles pour choisir la note -->
+			<div class="text-center mb-3">
+				<div id="starRating" class="star-rating">
+					{% for i in 1..5 %}
+						<i class="bi bi-star-fill" data-value="{{ i }}"></i>
+					{% endfor %}
+				</div>
+			</div>
+
+			<!-- Formulaire d'avis -->
+			{{ form_start(form) }}
+			{{ form_row(form.rating) }}
+			{{ form_row(form.comment, {'attr': {'class': 'form-control', 'placeholder': 'Votre commentaire…'}}) }}
+			<div class="text-center mt-3">
+				<button class="btn btn-primary px-4">Soumettre</button>
+			</div>
+			
+			{{ form_end(form) }}
+    <a href="{{ path('app_event_indexf') }}">back to list</a>
+
+			<hr
+			class="my-3">
+
+			<!-- Liste des avis existants -->
+			<h5 class="mb-3">Avis récents</h5>
+
+			<div class="reviews-scroll">
+				{% for review in reviews %}
+					<div
+						class="card-avis">
+						<!-- Étoiles selon la note -->
+						<div class="mb-1">
+							{% set emptyStars = 5 - review.rating %}
+							{% for i in 1..review.rating %}
+								<i class="bi bi-star-fill text-warning"></i>
+							{% endfor %}
+							{% if emptyStars > 0 %}
+								{% for i in 1..emptyStars %}
+									<i class="bi bi-star-fill text-muted"></i>
+								{% endfor %}
+							{% endif %}
+
+
+						</div>
+						<p class="mb-0">{{ review.comment }}</p>
+					</div>
+				{% else %}
+					<div class="alert alert-info">Aucun avis pour l’instant.</div>
+				{% endfor %}
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Script JS pour les étoiles interactives -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+const stars = document.querySelectorAll('#starRating .bi-star-fill');
+const ratingInput = document.getElementById('{{ form.rating.vars.id }}');
+let selectedRating = parseInt(ratingInput.value) || 0;
+
+// Mettre à jour l'affichage des étoiles
+function updateStars(rating) {
+stars.forEach((star, index) => {
+star.classList.toggle('selected', index < rating);
+});
+}
+
+// Initialiser l'affichage
+updateStars(selectedRating);
+
+stars.forEach(star => { // Survol : mettre en surbrillance
+star.addEventListener('mouseenter', () => {
+const value = parseInt(star.dataset.value);
+stars.forEach((s, i) => {
+s.classList.toggle('hovered', i < value);
+});
+});
+
+// Quitter le survol
+star.addEventListener('mouseleave', () => {
+stars.forEach(s => s.classList.remove('hovered'));
+});
+
+// Clic : enregistrer la note
+star.addEventListener('click', () => {
+selectedRating = parseInt(star.dataset.value);
+ratingInput.value = selectedRating;
+updateStars(selectedRating);
+});
+});
+});
+	</script>
+{% endblock %}

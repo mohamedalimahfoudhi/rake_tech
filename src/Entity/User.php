@@ -8,6 +8,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'utilisateur')]
@@ -26,7 +28,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?string $motdepasse = null;
-    
+
     /**
      * @var string The plain password
      */
@@ -197,4 +199,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
     }
-} 
+
+    
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Review::class)]
+    private Collection $reviews;
+
+    public function __construct()
+    {
+        $this->reviews = new ArrayCollection();
+    }
+
+    // Ajoute une méthode pour accéder à la collection des reviews
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+         public function __toString(): string
+    {
+        return $this->getNom(); // Or getEmail(), getFullName(), etc. depending on your app
+    }
+}

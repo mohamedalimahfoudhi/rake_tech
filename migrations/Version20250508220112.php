@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250507191221 extends AbstractMigration
+final class Version20250508220112 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -42,10 +42,13 @@ final class Version20250507191221 extends AbstractMigration
             CREATE TABLE reservation_billet (reservationID INT NOT NULL, billetID INT NOT NULL, INDEX IDX_57F2036DD91F71D7 (reservationID), INDEX IDX_57F2036DC53C928C (billetID), PRIMARY KEY(reservationID, billetID)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
+            CREATE TABLE review (id INT AUTO_INCREMENT NOT NULL, user_id INT DEFAULT NULL, event_id INT DEFAULT NULL, comment LONGTEXT NOT NULL, rating INT NOT NULL, INDEX IDX_794381C6A76ED395 (user_id), INDEX IDX_794381C671F7E88B (event_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+        SQL);
+        $this->addSql(<<<'SQL'
             CREATE TABLE role (roleID INT AUTO_INCREMENT NOT NULL, roleNom VARCHAR(255) NOT NULL, PRIMARY KEY(roleID)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE terrain (id INT AUTO_INCREMENT NOT NULL, court_type VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, status VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE terrain (id INT AUTO_INCREMENT NOT NULL, court_type VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, status VARCHAR(255) NOT NULL, latitude DOUBLE PRECISION NOT NULL, longitude DOUBLE PRECISION NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE tournoi (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(255) NOT NULL, dateDebut DATE NOT NULL, dateFin DATE NOT NULL, lieu VARCHAR(255) NOT NULL, typeSport VARCHAR(255) NOT NULL, statut VARCHAR(255) NOT NULL, recompense VARCHAR(255) NOT NULL, eventId INT DEFAULT NULL, INDEX IDX_18AFD9DF2B2EBB6C (eventId), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
@@ -85,6 +88,12 @@ final class Version20250507191221 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE reservation_billet ADD CONSTRAINT FK_57F2036DC53C928C FOREIGN KEY (billetID) REFERENCES billet (ID)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE review ADD CONSTRAINT FK_794381C6A76ED395 FOREIGN KEY (user_id) REFERENCES utilisateur (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE review ADD CONSTRAINT FK_794381C671F7E88B FOREIGN KEY (event_id) REFERENCES event (id)
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE tournoi ADD CONSTRAINT FK_18AFD9DF2B2EBB6C FOREIGN KEY (eventId) REFERENCES event (id)
@@ -131,6 +140,12 @@ final class Version20250507191221 extends AbstractMigration
             ALTER TABLE reservation_billet DROP FOREIGN KEY FK_57F2036DC53C928C
         SQL);
         $this->addSql(<<<'SQL'
+            ALTER TABLE review DROP FOREIGN KEY FK_794381C6A76ED395
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE review DROP FOREIGN KEY FK_794381C671F7E88B
+        SQL);
+        $this->addSql(<<<'SQL'
             ALTER TABLE tournoi DROP FOREIGN KEY FK_18AFD9DF2B2EBB6C
         SQL);
         $this->addSql(<<<'SQL'
@@ -162,6 +177,9 @@ final class Version20250507191221 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE reservation_billet
+        SQL);
+        $this->addSql(<<<'SQL'
+            DROP TABLE review
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE role
