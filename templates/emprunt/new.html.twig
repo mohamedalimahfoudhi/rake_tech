@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel Emprunt{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Créer un nouvel emprunt</h1>
+            <a href="{{ path('app_emprunt_index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="card">
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.materielid, 'Matériel', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.materielid, {'attr': {'class': 'form-control' ~ (form.materielid.vars.valid ? '' : ' is-invalid')}}) }}
+                                {{ form_errors(form.materielid) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.userid, 'Utilisateur', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.userid, {'attr': {'class': 'form-control' ~ (form.userid.vars.valid ? '' : ' is-invalid')}}) }}
+                                {{ form_errors(form.userid) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.dateemprunt, 'Date d\'emprunt', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.dateemprunt, {'attr': {'class': 'form-control' ~ (form.dateemprunt.vars.valid ? '' : ' is-invalid')}}) }}
+                                {{ form_errors(form.dateemprunt) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.dateretour, 'Date de retour', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.dateretour, {'attr': {'class': 'form-control' ~ (form.dateretour.vars.valid ? '' : ' is-invalid')}}) }}
+                                {{ form_errors(form.dateretour) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.statutemprunt, 'Statut', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.statutemprunt, {'attr': {'class': 'form-control' ~ (form.statutemprunt.vars.valid ? '' : ' is-invalid')}}) }}
+                                {{ form_errors(form.statutemprunt) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('app_emprunt_index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-label {
+            font-weight: 500;
+        }
+        .invalid-feedback {
+            display: block;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Enable Bootstrap form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+{% endblock %} 

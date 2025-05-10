@@ -1,0 +1,21 @@
+
+
+{% block title %} Calendar{% endblock %}
+
+
+{% block stylesheets %}
+  {# FullCalendar core + daygrid #}
+  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.min.css" rel="stylesheet"/>
+  {# Votre CSS packagé via Webpack Encore, si besoin #}
+  <link rel="stylesheet" href="{{ asset('build/app.css') }}">
+{% endblock %}
+
+{% block body %}
+<div data-controller="calendar"></div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ encore_entry_script_tags('app') }}
+{% endblock %}
+

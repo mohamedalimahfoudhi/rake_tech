@@ -1,0 +1,41 @@
+{# templates/tournoi/my_reservations.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Réservations{% endblock %}
+
+{% block body %}
+    <h1>Mes Réservations Confirmées</h1>
+
+    {% if reservations is not empty %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tournoi</th>
+                    <th>Date de Réservation</th>
+                    <th>Statut</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                    <tr>
+                        <td>{{ reservation.tournois.nom }}</td>
+                        <td>{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
+                        <td>{{ reservation.statut }}</td>
+                        <td>{{ reservation.type ?? 'Non spécifié' }}</td>
+                        <td>
+                            <form action="{{ path('reservation_delete', {'id': reservation.id}) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_' ~ reservation.id) }}">
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucune réservation confirmée.</p>
+    {% endif %}
+{% endblock %}

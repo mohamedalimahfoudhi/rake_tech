@@ -1,0 +1,87 @@
+<nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+    <div class="position-sticky pt-3">
+        <!-- Logo and User Info -->
+        <div class="text-center mb-4">
+            <div class="logo mb-3">
+                <span class="logo-racket">🎾</span>
+                <span class="logo-text">RackeTech</span>
+            </div>
+            <!-- Custom Dropdown Implementation -->
+            <div class="user-dropdown">
+                <div onclick="toggleUserDropdown()" class="btn btn-sm btn-light" id="userDropdownBtn">
+                    <i class="fas fa-user-circle me-1"></i> {{ app.user.prenom }} <i
+                        class="fas fa-caret-down"></i>
+                </div>
+                <div id="userDropdownContent" class="user-dropdown-content">
+                    <a href="{{ path('app_profile') }}">Profile</a>
+                    <div class="user-dropdown-divider"></div>
+                    <a href="{{ path('app_logout') }}">Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'app_admin_dashboard' %}active{% endif %}" href="{{ path('app_dashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'app_user_management' %}active{% endif %}" href="{{ path('app_user_management') }}">
+                    <i class="fas fa-users"></i> User Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'app_emprunt_index' %}active{% endif %}" href="{{ path('app_emprunt_index') }}">
+                    <i class="fas fa-handshake"></i> Emprunt Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'app_materiel_index' %}active{% endif %}" href="{{ path('app_materiel_index') }}">
+                    <i class="fas fa-toolbox"></i> Materiels Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'app_tournoi_index' %}active{% endif %}" href="{{ path('app_tournoi_index') }}">
+                    <i class="fas fa-trophy"></i> Tournoi Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'app_reservation_index' %}active{% endif %}" href="{{ path('app_reservation_index') }}">
+                    <i class="fas fa-calendar-check"></i> Reservation Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'app_maintenance_index' %}active{% endif %}" href="{{ path('app_maintenance_index') }}">
+                    <i class="fas fa-wrench"></i> Maintenance Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'admin_statistics' %}active{% endif %}" href="{{ path('admin_statistics') }}">
+                    <i class="fas fa-chart-bar"></i> Statistiques
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'app_ticket_index' %}active{% endif %}" href="{{ path('app_ticket_index') }}">
+                    <i class="fas fa-ticket-alt"></i> Ticket Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'app_event_index' %}active{% endif %}" href="{{ path('app_event_index') }}">
+                    <i class="fas fa-calendar"></i> Events
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'app_terrain_index' %}active{% endif %}" href="{{ path('app_terrain_index') }}">
+                    <i class="fas fa-map"></i> Terrains
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') == 'calb' %}active{% endif %}" href="{{ path('calb') }}">
+                    <i class="fas fa-calendar"></i> Calendar Events
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav> 

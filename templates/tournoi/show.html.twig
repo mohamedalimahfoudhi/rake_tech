@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du Tournoi{% endblock %}
+
+{% block page_title %}Détails du Tournoi{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Détails du tournoi</h5>
+                <div class="btn-group">
+                    <a href="{{ path('app_tournoi_edit', {'id': tournoi.id}) }}" class="btn btn-warning">
+                        <i class="ri-edit-line"></i> Modifier
+                    </a>
+                    <a href="{{ path('app_tournoi_index') }}" class="btn btn-secondary">
+                        <i class="ri-arrow-go-back-line"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <th class="bg-primary text-white" style="width: 200px;">Nom</th>
+                                        <td class="bg-light">{{ tournoi.nom }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-primary text-white">Type de sport</th>
+                                        <td class="bg-light">{{ tournoi.typesport }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-primary text-white">Date de début</th>
+                                        <td class="bg-light">{{ tournoi.datedebut ? tournoi.datedebut|date('d/m/Y') : '' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-primary text-white">Date de fin</th>
+                                        <td class="bg-light">{{ tournoi.datefin ? tournoi.datefin|date('d/m/Y') : '' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <th class="bg-primary text-white" style="width: 200px;">Lieu</th>
+                                        <td class="bg-light">{{ tournoi.lieu }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-primary text-white">ID de l'événement</th>
+                                        <td class="bg-light">{{ tournoi.eventid }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-primary text-white">Statut</th>
+                                        <td class="bg-light">
+                                            {% if tournoi.statut == 'Prévu' %}
+                                                <span class="badge badge-info">Prévu</span>
+                                            {% elseif tournoi.statut == 'En cours' %}
+                                                <span class="badge badge-success">En cours</span>
+                                            {% elseif tournoi.statut == 'Terminé' %}
+                                                <span class="badge badge-secondary">Terminé</span>
+                                            {% elseif tournoi.statut == 'Annulé' %}
+                                                <span class="badge badge-danger">Annulé</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-primary text-white">Récompense</th>
+                                        <td class="bg-light">{{ tournoi.recompense }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                           <h3>Générer QR Code pour ce tournoi</h3>
+                            <form action="{{ path('tournoi_qr_generate', {'id': tournoi.id}) }}" method="post">
+                                <button type="submit" class="btn btn-primary">Générer QR Code</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le billet - RackeTech{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        {% include 'partials/_admin_sidebar.html.twig' %}
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Modifier le billet #{{ billet.id }}</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{{ path('app_ticket_index', {'page': page, 'limit': limit, 'currency': currency, 'type': type}) }}" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    <input type="hidden" name="page" value="{{ page }}">
+                    <input type="hidden" name="limit" value="{{ limit }}">
+                    <input type="hidden" name="currency" value="{{ currency }}">
+                    <input type="hidden" name="type" value="{{ type }}">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form_row(form.typebillet) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.prix) }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form_row(form.quantite) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.statut) }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            {{ form_row(form.eventid) }}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('app_ticket_index', {'page': page, 'limit': limit, 'currency': currency, 'type': type}) }}" class="btn btn-secondary">Annuler</a>
+                        {{ form_row(form.save) }}
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Carte des terrains</h1>
+<div id="map" style="height: 600px;"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+<script>
+    const map = L.map('map').setView([36.8, 10.18], 10); // centré sur Tunis
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    fetch('/api/terrains')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(terrain => {
+                const marker = L.marker([terrain.latitude, terrain.longitude], {
+                    icon: L.icon({
+                        iconUrl: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 32],
+                        popupAnchor: [0, -32]
+                    })
+                }).addTo(map);
+                
+                marker.bindPopup(`<b>${terrain.name}</b>`);
+            });
+        });
+</script>
+{% endblock %}

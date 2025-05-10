@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Matériels - RackeTech</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.4;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .date {
+            margin-top: 10px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .status-disponible {
+            color: green;
+            font-weight: bold;
+        }
+        .status-reserve {
+            color: orange;
+            font-weight: bold;
+        }
+        .status-maintenance {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">RackeTech - Gestion des Matériels</div>
+        <div class="date">Exporté le {{ date|date('d/m/Y à H:i') }}</div>
+    </div>
+    
+    <h1>Liste des Matériels</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Sport</th>
+                <th>Prix</th>
+                <th>Date de réservation</th>
+                <th>Statut</th>
+                <th>Propriétaire</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for materiel in materiels %}
+                <tr>
+                    <td>{{ materiel.type }}</td>
+                    <td>{{ materiel.typesport }}</td>
+                    <td>{{ materiel.prix|number_format(2, ',', ' ') }} €</td>
+                    <td>{{ materiel.datereservation ? materiel.datereservation|date('d/m/Y H:i') : 'Non définie' }}</td>
+                    <td>
+                        {% if materiel.statut == 'Disponible' %}
+                            <span class="status-disponible">Disponible</span>
+                        {% elseif materiel.statut == 'Réservé' %}
+                            <span class="status-reserve">Réservé</span>
+                        {% else %}
+                            <span class="status-maintenance">En maintenance</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if materiel.ownertype == 'Club' %}
+                            Club
+                        {% else %}
+                            Autre
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">Aucun matériel trouvé</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="footer">
+        <p>Document généré automatiquement par l'application RackeTech</p>
+        <p>© {{ 'now'|date('Y') }} RackeTech - Tous droits réservés</p>
+    </div>
+</body>
+</html> 

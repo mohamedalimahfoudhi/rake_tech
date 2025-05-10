@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Billet - RackeTech{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        {% include 'partials/_admin_sidebar.html.twig' %}
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Créer un nouveau billet</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{{ path('app_ticket_index') }}" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.typebillet) }}
+                                {{ form_widget(form.typebillet) }}
+                                {{ form_errors(form.typebillet) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.prix) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.prix) }}
+                                    <span class="input-group-text">€</span>
+                                </div>
+                                {{ form_errors(form.prix) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.quantite) }}
+                                {{ form_widget(form.quantite) }}
+                                {{ form_errors(form.quantite) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.statut) }}
+                                {{ form_widget(form.statut) }}
+                                {{ form_errors(form.statut) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.eventid) }}
+                                {{ form_widget(form.eventid) }}
+                                {{ form_errors(form.eventid) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        {{ form_widget(form.save) }}
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %} 

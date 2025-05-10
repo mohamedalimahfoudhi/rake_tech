@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticket Details - RackeTech{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .ticket-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .ticket-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .ticket-header {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        padding: 20px;
+    }
+    
+    .ticket-status {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        border-radius: 20px;
+    }
+    
+    .ticket-body {
+        padding: 30px;
+    }
+    
+    .ticket-info {
+        margin-bottom: 30px;
+    }
+    
+    .ticket-qr {
+        text-align: center;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .ticket-qr img {
+        max-width: 200px;
+        margin: 0 auto;
+    }
+    
+    .ticket-footer {
+        background-color: #f8f9fa;
+        padding: 15px;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4 mb-5">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1>Ticket Details</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ path('app_athlete_tickets') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to My Tickets
+            </a>
+        </div>
+    </div>
+    
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('warning') %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+    
+    <div class="ticket-container">
+        <div class="ticket-card">
+            <div class="ticket-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0">{{ billet.typebillet }}</h2>
+                    <p class="mb-0">{{ billet.eventid ? billet.eventid.name : 'No event assigned' }}</p>
+                </div>
+                <span class="ticket-status 
+                    {% if billet.statut == 'Valide' %}bg-success
+                    {% elseif billet.statut == 'Utilisé' %}bg-secondary
+                    {% else %}bg-danger{% endif %}">
+                    {{ billet.statut }}
+                </span>
+            </div>
+            
+            <div class="ticket-body">
+                <div class="row ticket-info">
+                    <div class="col-md-6">
+                        <h5>Ticket Information</h5>
+                        <p><strong>ID:</strong> #{{ billet.id }}</p>
+                        <p><strong>Type:</strong> {{ billet.typebillet }}</p>
+                        <p><strong>Price:</strong> {{ billet.prix }} €</p>
+                        <p><strong>Quantity:</strong> {{ billet.quantite }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Event Information</h5>
+                        {% if billet.eventid %}
+                            <p><strong>Event:</strong> {{ billet.eventid.name }}</p>
+                            <p><strong>Date:</strong> {{ billet.eventid.startDate ? billet.eventid.startDate|date('d/m/Y H:i') : 'Not specified' }}</p>
+                            <p><strong>Location:</strong> {{ billet.eventid.terrain ? billet.eventid.terrain.name ~ ' (' ~ billet.eventid.terrain.location ~ ')' : 'Not specified' }}</p>
+                        {% else %}
+                            <p>No event information available</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="ticket-qr">
+                    <h5 class="mb-3">Ticket QR Code</h5>
+                    <div class="mb-3">
+                        <img src="{{ qrCode }}" alt="Ticket QR Code">
+                    </div>
+                    <p class="text-muted">Scan this QR code at the event entrance</p>
+                </div>
+            </div>
+            
+            <div class="ticket-footer">
+                <p class="mb-0">This ticket was issued by RackeTech. For any questions, please contact support.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

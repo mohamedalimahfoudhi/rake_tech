@@ -1,0 +1,154 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Tickets - RackeTech{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .pagination {
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .page-navigation {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+    
+    .page-info {
+        margin: 0 15px;
+    }
+    
+    .pagination-controls {
+        margin-bottom: 15px;
+    }
+    
+    .ticket-card {
+        border-left: 4px solid #17a2b8;
+        transition: transform 0.2s;
+    }
+    
+    .ticket-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .ticket-valid {
+        border-left-color: #28a745;
+    }
+    
+    .ticket-used {
+        border-left-color: #6c757d;
+    }
+    
+    .ticket-invalid {
+        border-left-color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1>My Tickets</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ path('app_athlete_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    <div class="row">
+        {% if pagination.getTotalItemCount > 0 %}
+            {% for billet in pagination %}
+                <div class="col-md-6 mb-4">
+                    <div class="card ticket-card 
+                        {% if billet.statut == 'Valide' %}ticket-valid
+                        {% elseif billet.statut == 'Utilisé' %}ticket-used
+                        {% else %}ticket-invalid{% endif %}">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ billet.typebillet }}</h5>
+                            <span class="badge {% if billet.statut == 'Valide' %}bg-success
+                                {% elseif billet.statut == 'Utilisé' %}bg-secondary
+                                {% else %}bg-danger{% endif %}">
+                                {{ billet.statut }}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                Event: {{ billet.eventid ? billet.eventid.name : 'N/A' }}
+                            </h6>
+                            <div class="row mt-3">
+                                <div class="col-6">
+                                    <p><strong>Price:</strong> {{ billet.prix }} €</p>
+                                </div>
+                                <div class="col-6">
+                                    <p><strong>Quantity:</strong> {{ billet.quantite }}</p>
+                                </div>
+                            </div>
+                            <div class="text-end mt-3">
+                                <a href="{{ path('app_athlete_ticket_view', {'id': billet.id}) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    You don't have any tickets yet.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if pagination.getTotalItemCount > 0 %}
+        <!-- Custom Pagination -->
+        <div class="page-navigation">
+            <a href="{{ path('app_athlete_tickets', {'page': 1, 'limit': itemsPerPage}) }}" 
+               class="btn btn-sm btn-outline-primary {% if pagination.currentPageNumber == 1 %}disabled{% endif %}">
+                <i class="fas fa-angle-double-left"></i>
+            </a>
+            
+            <a href="{{ path('app_athlete_tickets', {'page': pagination.currentPageNumber - 1, 'limit': itemsPerPage}) }}" 
+               class="btn btn-sm btn-outline-primary {% if pagination.currentPageNumber == 1 %}disabled{% endif %}">
+                <i class="fas fa-angle-left"></i>
+            </a>
+            
+            <span class="page-info">
+                Page {{ pagination.currentPageNumber }} of {{ totalPages }}
+            </span>
+            
+            <a href="{{ path('app_athlete_tickets', {'page': pagination.currentPageNumber + 1, 'limit': itemsPerPage}) }}" 
+               class="btn btn-sm btn-outline-primary {% if pagination.currentPageNumber == totalPages %}disabled{% endif %}">
+                <i class="fas fa-angle-right"></i>
+            </a>
+            
+            <a href="{{ path('app_athlete_tickets', {'page': totalPages, 'limit': itemsPerPage}) }}" 
+               class="btn btn-sm btn-outline-primary {% if pagination.currentPageNumber == totalPages %}disabled{% endif %}">
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

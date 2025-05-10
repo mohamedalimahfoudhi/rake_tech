@@ -1,0 +1,590 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Billets - RackeTech{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .currency-converter {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    .price-calculator {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    .stats-card {
+        background-color: #fff;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    .pagination {
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .calculator-section {
+        display: none;
+    }
+    .cart-section {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        display: none;
+    }
+    .cart-item {
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #fff;
+        border-radius: 4px;
+        border: 1px solid #e9ecef;
+    }
+    .cart-badge {
+        position: relative;
+        top: -8px;
+        right: -5px;
+        font-size: 0.7em;
+    }
+    .pagination-controls {
+        margin-bottom: 15px;
+    }
+    .page-navigation {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+    .page-info {
+        margin: 0 15px;
+    }
+    .filter-section {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    .filter-badge {
+        margin-left: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        {% include 'partials/_admin_sidebar.html.twig' %}
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Gestion des Billets</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <button id="toggle-calculator" class="btn btn-sm btn-secondary me-2">
+                        <i class="fas fa-calculator"></i> Calculateur de prix
+                    </button>
+                    <button id="toggle-cart" class="btn btn-sm btn-secondary me-2">
+                        <i class="fas fa-shopping-cart"></i> Panier <span id="cart-count" class="badge bg-danger cart-badge">0</span>
+                    </button>
+                    <a href="{{ path('app_ticket_export_pdf', {'type': filterType, 'currency': selectedCurrency}) }}" class="btn btn-sm btn-danger me-2" title="Export to PDF">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </a>
+                    <a href="{{ path('app_ticket_new', {'limit': itemsPerPage, 'currency': selectedCurrency}) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Nouveau Billet
+                    </a>
+                </div>
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+
+            <!-- Stats Cards -->
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <div class="stats-card">
+                        <h5 class="card-title">Total des billets</h5>
+                        <p class="h3">{{ pagination.getTotalItemCount }}</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stats-card">
+                        <h5 class="card-title">Valeur totale ({{ selectedCurrency }})</h5>
+                        <p class="h3">{{ (totalValue * selectedRate)|number_format(2) }}</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4 calculator-section">
+                    <div class="currency-converter">
+                        <h5>Convertisseur de devises</h5>
+                        <form class="row g-3" method="get">
+                            <input type="hidden" name="page" value="{{ pagination.currentPageNumber }}">
+                            <input type="hidden" name="limit" value="{{ itemsPerPage }}">
+                            <input type="hidden" name="type" value="{{ filterType }}">
+                            <div class="col-md-6">
+                                <label for="currency-select" class="form-label">Devise</label>
+                                <select id="currency-select" name="currency" class="form-select" onchange="this.form.submit()">
+                                    {% for currency, rate in exchangeRates %}
+                                        <option value="{{ currency }}" {% if currency == selectedCurrency %}selected{% endif %}>
+                                            {{ currency }} ({{ rate }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="conversion-result" class="form-label">Taux de conversion</label>
+                                <input type="text" class="form-control" id="conversion-result" value="{{ selectedRate }}" readonly>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-filter"></i> Filtres</h5>
+                    {% if filterType %}
+                        <a href="{{ path('app_ticket_index', {'page': 1, 'limit': itemsPerPage, 'currency': selectedCurrency}) }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-times"></i> Réinitialiser
+                        </a>
+                    {% endif %}
+                </div>
+                <form method="get" class="row g-3">
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="limit" value="{{ itemsPerPage }}">
+                    <input type="hidden" name="currency" value="{{ selectedCurrency }}">
+                    
+                    <div class="col-md-4">
+                        <label for="type-filter" class="form-label">Type de billet</label>
+                        <select id="type-filter" name="type" class="form-select" onchange="this.form.submit()">
+                            {% for label, value in ticketTypes %}
+                                <option value="{{ value }}" {% if value == filterType %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+                
+                <!-- Active filters -->
+                <div class="mt-3">
+                    {% if filterType %}
+                        <span class="badge bg-info filter-badge">
+                            Type: {{ filterType }} <a href="{{ path('app_ticket_index', {'page': 1, 'limit': itemsPerPage, 'currency': selectedCurrency}) }}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Shopping Cart Section -->
+            <div id="cart-section" class="cart-section">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-shopping-cart"></i> Panier</h5>
+                    <button id="clear-cart" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash"></i> Vider le panier
+                    </button>
+                </div>
+                <div id="cart-items" class="mb-3">
+                    <!-- Cart items will be added here dynamically -->
+                    <div class="text-center text-muted" id="empty-cart-message">
+                        Votre panier est vide
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <select id="cart-currency" class="form-select mb-3">
+                            {% for currency, rate in exchangeRates %}
+                                <option value="{{ rate }}" data-currency="{{ currency }}">
+                                    {{ currency }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <h5>Total: <span id="cart-total">0.00</span> <span id="cart-currency-code">EUR</span></h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="pagination-controls d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary page-size-btn active" data-size="3">3</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary page-size-btn" data-size="10">10</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary page-size-btn" data-size="25">25</button>
+                    </div>
+                </div>
+                <div>
+                    <span class="badge bg-info">{{ pagination.currentPageNumber }} / {{ totalPages }}</span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Prix ({{ selectedCurrency }})</th>
+                            <th>Quantité</th>
+                            <th>Statut</th>
+                            <th>Date d'achat</th>
+                            <th>Événement</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if pagination.items|length > 0 %}
+                            {% for billet in pagination %}
+                                <tr>
+                                    <td>{{ billet.id }}</td>
+                                    <td>{{ billet.typeBillet }}</td>
+                                    <td>{{ (billet.prix * selectedRate)|number_format(2) }}</td>
+                                    <td>{{ billet.quantite }}</td>
+                                    <td>
+                                        {% if billet.statut == 'Valide' %}
+                                            <span class="badge bg-success">{{ billet.statut }}</span>
+                                        {% elseif billet.statut == 'Non valide' %}
+                                            <span class="badge bg-warning">{{ billet.statut }}</span>
+                                        {% elseif billet.statut == 'Utilisé' %}
+                                            <span class="badge bg-info">{{ billet.statut }}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{ billet.statut }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ billet.dateAchat ? billet.dateAchat|date('d/m/Y H:i') : 'N/A' }}</td>
+                                    <td>{{ billet.eventId ? billet.eventId.name : 'N/A' }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ path('app_ticket_view', {'id': billet.id}) }}" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ path('app_ticket_edit', {'id': billet.id, 'page': pagination.currentPageNumber, 'limit': itemsPerPage, 'currency': selectedCurrency, 'type': filterType}) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('app_ticket_delete', {'id': billet.id, 'page': pagination.currentPageNumber, 'limit': itemsPerPage, 'currency': selectedCurrency, 'type': filterType}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce billet?');" style="display: inline-block;">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ billet.id) }}">
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                            <button class="btn btn-sm btn-outline-success add-to-cart" 
+                                                data-id="{{ billet.id }}" 
+                                                data-type="{{ billet.typeBillet }}" 
+                                                data-price="{{ billet.prix }}" 
+                                                data-event="{{ billet.eventId ? billet.eventId.name : 'N/A' }}">
+                                                <i class="fas fa-cart-plus"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center">Aucun billet trouvé</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Custom Pagination -->
+            <div class="page-navigation">
+                <a href="{{ path('app_ticket_index', {'page': 1, 'limit': itemsPerPage, 'currency': selectedCurrency, 'type': filterType}) }}" 
+                   class="btn btn-sm btn-outline-primary {% if pagination.currentPageNumber == 1 %}disabled{% endif %}">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                
+                <a href="{{ path('app_ticket_index', {'page': pagination.currentPageNumber - 1, 'limit': itemsPerPage, 'currency': selectedCurrency, 'type': filterType}) }}" 
+                   class="btn btn-sm btn-outline-primary {% if pagination.currentPageNumber == 1 %}disabled{% endif %}">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+                
+                <span class="page-info">
+                    Page {{ pagination.currentPageNumber }} sur {{ totalPages }}
+                </span>
+                
+                <a href="{{ path('app_ticket_index', {'page': pagination.currentPageNumber + 1, 'limit': itemsPerPage, 'currency': selectedCurrency, 'type': filterType}) }}" 
+                   class="btn btn-sm btn-outline-primary {% if pagination.currentPageNumber == totalPages %}disabled{% endif %}">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                
+                <a href="{{ path('app_ticket_index', {'page': totalPages, 'limit': itemsPerPage, 'currency': selectedCurrency, 'type': filterType}) }}" 
+                   class="btn btn-sm btn-outline-primary {% if pagination.currentPageNumber == totalPages %}disabled{% endif %}">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+
+            <!-- Price Calculator -->
+            <div class="price-calculator calculator-section">
+                <h5>Calculateur de prix</h5>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="calculator-price" class="form-label">Prix unitaire (EUR)</label>
+                        <input type="number" class="form-control" id="calculator-price" value="10" min="0" step="0.01">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="calculator-quantity" class="form-label">Quantité</label>
+                        <input type="number" class="form-control" id="calculator-quantity" value="1" min="1">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="calculator-currency" class="form-label">Devise</label>
+                        <select id="calculator-currency" class="form-select">
+                            {% for currency, rate in exchangeRates %}
+                                <option value="{{ rate }}" {% if currency == selectedCurrency %}selected{% endif %}>
+                                    {{ currency }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="calculator-result" class="form-label">Montant total</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="calculator-result" readonly>
+                            <span class="input-group-text" id="calculator-currency-code">EUR</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Price calculator functionality
+        const calculatorPrice = document.getElementById('calculator-price');
+        const calculatorQuantity = document.getElementById('calculator-quantity');
+        const calculatorCurrency = document.getElementById('calculator-currency');
+        const calculatorResult = document.getElementById('calculator-result');
+        const calculatorCurrencyCode = document.getElementById('calculator-currency-code');
+        
+        function updateCalculation() {
+            const price = parseFloat(calculatorPrice.value) || 0;
+            const quantity = parseInt(calculatorQuantity.value) || 1;
+            const rate = parseFloat(calculatorCurrency.value) || 1;
+            const total = price * quantity * rate;
+            
+            calculatorResult.value = total.toFixed(2);
+            calculatorCurrencyCode.textContent = calculatorCurrency.options[calculatorCurrency.selectedIndex].text;
+        }
+        
+        calculatorPrice.addEventListener('input', updateCalculation);
+        calculatorQuantity.addEventListener('input', updateCalculation);
+        calculatorCurrency.addEventListener('change', updateCalculation);
+        
+        // Initialize calculation
+        updateCalculation();
+        
+        // Toggle calculator sections
+        const toggleCalculatorBtn = document.getElementById('toggle-calculator');
+        const calculatorSections = document.querySelectorAll('.calculator-section');
+        
+        toggleCalculatorBtn.addEventListener('click', function() {
+            calculatorSections.forEach(section => {
+                if (section.style.display === 'block') {
+                    section.style.display = 'none';
+                    toggleCalculatorBtn.classList.remove('btn-primary');
+                    toggleCalculatorBtn.classList.add('btn-secondary');
+                } else {
+                    section.style.display = 'block';
+                    toggleCalculatorBtn.classList.remove('btn-secondary');
+                    toggleCalculatorBtn.classList.add('btn-primary');
+                }
+            });
+        });
+        
+        // Shopping cart functionality
+        const toggleCartBtn = document.getElementById('toggle-cart');
+        const cartSection = document.getElementById('cart-section');
+        const cartItems = document.getElementById('cart-items');
+        const cartCount = document.getElementById('cart-count');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+        const clearCartBtn = document.getElementById('clear-cart');
+        const cartCurrency = document.getElementById('cart-currency');
+        const cartTotal = document.getElementById('cart-total');
+        const cartCurrencyCode = document.getElementById('cart-currency-code');
+        
+        // Load cart from localStorage if available
+        let cart = [];
+        try {
+            const savedCart = localStorage.getItem('billetCart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                updateCart();
+            }
+        } catch (e) {
+            console.error('Error loading cart from localStorage', e);
+        }
+        
+        // Add to cart buttons
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const type = this.dataset.type;
+                const price = parseFloat(this.dataset.price);
+                const event = this.dataset.event;
+                
+                // Check if item already in cart
+                const existingItem = cart.find(item => item.id === id);
+                
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({
+                        id: id,
+                        type: type,
+                        price: price,
+                        quantity: 1,
+                        event: event
+                    });
+                }
+                
+                // Save cart to localStorage
+                try {
+                    localStorage.setItem('billetCart', JSON.stringify(cart));
+                } catch (e) {
+                    console.error('Error saving cart to localStorage', e);
+                }
+                
+                updateCart();
+                
+                // Show cart automatically when adding items
+                if (cartSection.style.display !== 'block') {
+                    cartSection.style.display = 'block';
+                    toggleCartBtn.classList.remove('btn-secondary');
+                    toggleCartBtn.classList.add('btn-primary');
+                }
+            });
+        });
+        
+        // Toggle cart visibility
+        toggleCartBtn.addEventListener('click', function() {
+            if (cartSection.style.display === 'block') {
+                cartSection.style.display = 'none';
+                toggleCartBtn.classList.remove('btn-primary');
+                toggleCartBtn.classList.add('btn-secondary');
+            } else {
+                cartSection.style.display = 'block';
+                toggleCartBtn.classList.remove('btn-secondary');
+                toggleCartBtn.classList.add('btn-primary');
+            }
+        });
+        
+        // Clear cart
+        clearCartBtn.addEventListener('click', function() {
+            cart = [];
+            // Clear localStorage
+            localStorage.removeItem('billetCart');
+            updateCart();
+        });
+        
+        // Update cart currency
+        cartCurrency.addEventListener('change', updateCart);
+        
+        // Update cart display
+        function updateCart() {
+            // Update cart count
+            cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+            
+            // Clear cart items
+            while (cartItems.firstChild) {
+                cartItems.removeChild(cartItems.firstChild);
+            }
+            
+            // Show empty cart message if needed
+            if (cart.length === 0) {
+                cartItems.appendChild(emptyCartMessage);
+                cartTotal.textContent = '0.00';
+                return;
+            } else {
+                // Hide empty cart message
+                if (emptyCartMessage.parentNode === cartItems) {
+                    cartItems.removeChild(emptyCartMessage);
+                }
+            }
+            
+            // Get selected currency rate
+            const rate = parseFloat(cartCurrency.value) || 1;
+            const currencyCode = cartCurrency.options[cartCurrency.selectedIndex].dataset.currency;
+            cartCurrencyCode.textContent = currencyCode;
+            
+            // Add cart items
+            let totalPrice = 0;
+            
+            cart.forEach(item => {
+                const itemPrice = item.price * rate;
+                const itemTotal = itemPrice * item.quantity;
+                totalPrice += itemTotal;
+                
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                
+                cartItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6>${item.type} - ${item.event}</h6>
+                            <small>Prix: ${itemPrice.toFixed(2)} ${currencyCode} × ${item.quantity}</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="me-3">${itemTotal.toFixed(2)} ${currencyCode}</span>
+                            <button class="btn btn-sm btn-outline-danger remove-item" data-id="${item.id}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                cartItems.appendChild(cartItem);
+                
+                // Add remove button event listener
+                const removeButton = cartItem.querySelector('.remove-item');
+                removeButton.addEventListener('click', function() {
+                    const itemId = this.dataset.id;
+                    cart = cart.filter(item => item.id !== itemId);
+                    // Update localStorage
+                    localStorage.setItem('billetCart', JSON.stringify(cart));
+                    updateCart();
+                });
+            });
+            
+            // Update total
+            cartTotal.textContent = totalPrice.toFixed(2);
+        }
+        
+        // Pagination page size buttons
+        const pageSizeButtons = document.querySelectorAll('.page-size-btn');
+        
+        pageSizeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Update active button
+                pageSizeButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Get the page size
+                const pageSize = this.dataset.size;
+                
+                // Redirect to page 1 with the new limit and preserve filters
+                window.location.href = '{{ path('app_ticket_index') }}?page=1&limit=' + pageSize + '&currency={{ selectedCurrency }}&type={{ filterType }}';
+            });
+        });
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,67 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">{{ title|default('Informations du Matériel') }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {{ form_label(form.type) }}
+                        {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.type) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {{ form_label(form.typesport) }}
+                        {{ form_widget(form.typesport, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.typesport) }}
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {{ form_label(form.prix) }}
+                        {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.prix) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {{ form_label(form.datereservation) }}
+                        {{ form_widget(form.datereservation, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.datereservation) }}
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {{ form_label(form.statut) }}
+                        {{ form_widget(form.statut, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.statut) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {{ form_label(form.ownertype) }}
+                        {{ form_widget(form.ownertype, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.ownertype) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                <a href="{{ path('app_materiel_index') }}" class="btn btn-secondary">
+                    <i class="ri-arrow-left-line mr-1"></i> Retour
+                </a>
+                <button class="btn btn-primary">
+                    <i class="ri-save-line mr-1"></i> {{ button_label|default('Enregistrer') }}
+                </button>
+            </div>
+        </div>
+    </div>
+{{ form_end(form) }} 

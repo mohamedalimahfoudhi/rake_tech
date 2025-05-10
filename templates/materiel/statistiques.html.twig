@@ -1,0 +1,248 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques des Matériels{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .stats-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3e4c6d;
+        }
+        
+        .stats-title {
+            color: #626e8c;
+            font-size: 1.1rem;
+        }
+        
+        .bg-green-light {
+            background-color: #e3f7e8;
+        }
+        
+        .bg-blue-light {
+            background-color: #e6f3ff;
+        }
+        
+        .bg-orange-light {
+            background-color: #fff4e6;
+        }
+        
+        .bg-red-light {
+            background-color: #ffe6e6;
+        }
+        
+        .bg-info-light {
+            background-color: #e6f7fa;
+        }
+        
+        .stats-table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .stats-table th {
+            background-color: #f8f9fa;
+            padding: 10px;
+        }
+        
+        .stats-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .stats-section {
+            margin-bottom: 30px;
+        }
+        
+        .stats-section-title {
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            font-size: 1.5rem;
+            color: #3e4c6d;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2">Statistiques des Matériels</h1>
+            <a href="{{ path('app_materiel_index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+        
+        <div class="stats-section">
+            <h2 class="stats-section-title">Aperçu des Matériels</h2>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stats-card bg-blue-light">
+                        <div class="stats-number">{{ totalMaterials }}</div>
+                        <div class="stats-title">Total des matériels</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card bg-green-light">
+                        <div class="stats-number">{{ availableMaterials }}</div>
+                        <div class="stats-title">Matériels disponibles</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card bg-orange-light">
+                        <div class="stats-number">{{ rentedMaterials }}</div>
+                        <div class="stats-title">Matériels en emprunt</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card bg-red-light">
+                        <div class="stats-number">{{ maintenanceMaterials }}</div>
+                        <div class="stats-title">Matériels en maintenance</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Distribution par Type
+                        </div>
+                        <div class="card-body">
+                            <table class="stats-table">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Nombre</th>
+                                        <th>Pourcentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in typesDistribution %}
+                                        <tr>
+                                            <td>{{ item.type }}</td>
+                                            <td>{{ item.count }}</td>
+                                            <td>{{ (item.count / totalMaterials * 100)|round(1) }}%</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-section">
+            <h2 class="stats-section-title">Statistiques des Emprunts</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stats-card bg-blue-light">
+                        <div class="stats-number">{{ totalLoans }}</div>
+                        <div class="stats-title">Total des emprunts</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card bg-green-light">
+                        <div class="stats-number">{{ activeLoans }}</div>
+                        <div class="stats-title">Emprunts actifs</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card bg-orange-light">
+                        <div class="stats-number">{{ completedLoans }}</div>
+                        <div class="stats-title">Emprunts complétés</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Matériels les plus empruntés (Top 5)
+                        </div>
+                        <div class="card-body">
+                            <table class="stats-table">
+                                <thead>
+                                    <tr>
+                                        <th>Matériel</th>
+                                        <th>Type</th>
+                                        <th>Nombre d'emprunts</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in mostBorrowedMaterials %}
+                                        <tr>
+                                            <td>{{ item.nom }}</td>
+                                            <td>{{ item.type }}</td>
+                                            <td>{{ item.emprunts }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-section">
+            <h2 class="stats-section-title">Statistiques des Maintenances</h2>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stats-card bg-blue-light">
+                        <div class="stats-number">{{ totalMaintenances }}</div>
+                        <div class="stats-title">Total des maintenances</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card bg-green-light">
+                        <div class="stats-number">{{ activeMaintenances }}</div>
+                        <div class="stats-title">Maintenances en cours</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card bg-orange-light">
+                        <div class="stats-number">{{ completedMaintenances }}</div>
+                        <div class="stats-title">Maintenances terminées</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card bg-red-light">
+                        <div class="stats-number">{{ maintenanceCost|number_format(2, ',', ' ') }} €</div>
+                        <div class="stats-title">Coût total</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="stats-card">
+                        <div class="stats-number">{{ averageMaintenanceDuration }} jours</div>
+                        <div class="stats-title">Durée moyenne des maintenances</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stats-card bg-info-light">
+                        <div class="stats-number">{{ maintenanceCostCurrentYear|number_format(2, ',', ' ') }} €</div>
+                        <div class="stats-title">Coût des maintenances en {{ currentYear }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

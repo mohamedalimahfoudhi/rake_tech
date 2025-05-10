@@ -1,0 +1,548 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    /* Custom validation popup */
+    .validation-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        border: 1px solid #dc3545;
+        border-radius: 5px;
+        padding: 20px;
+        font-size: 14px;
+        color: #dc3545;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        z-index: 9999;
+        max-width: 350px;
+        text-align: left;
+        display: none;
+    }
+    
+    /* Field validation indicators */
+    .form-group {
+        position: relative;
+    }
+    
+    .field-error-message {
+        display: none;
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 4px;
+        padding: 4px 8px;
+        background-color: #fff;
+        border: 1px solid #dc3545;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .field-error-icon {
+        display: none;
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #dc3545;
+        font-size: 16px;
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        padding-right: calc(1.5em + 0.75rem);
+        background-color: #fff;
+    }
+
+    /* Card styling */
+    .card-header {
+        background-color: #28a745;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        padding: 1.5rem;
+        color: white;
+    }
+
+    /* Form styling */
+    .card {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        border: none;
+        border-radius: 0.5rem;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-control {
+        border-radius: 0.375rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid #ced4da;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .btn-primary {
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        border-radius: 0.375rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #212529;
+    }
+
+    .form-row {
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h3 mb-3 font-weight-normal text-center">Register</h1>
+                </div>
+                <div class="card-body">
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-danger">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    <form method="post" id="registrationForm" autocomplete="off" novalidate>
+                        {{ form_start(registrationForm) }}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        {{ form_label(registrationForm.email) }}
+                                        {{ form_widget(registrationForm.email, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'autocomplete': 'off',
+                                                'data-validate': 'email'
+                                            }
+                                        }) }}
+                                        <div class="field-error-message" id="email-error"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        {{ form_label(registrationForm.password) }}
+                                        {{ form_widget(registrationForm.password, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'autocomplete': 'new-password',
+                                                'data-validate': 'password'
+                                            }
+                                        }) }}
+                                        <div class="field-error-message" id="password-error"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        {{ form_label(registrationForm.prenom) }}
+                                        {{ form_widget(registrationForm.prenom, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'autocomplete': 'off',
+                                                'data-validate': 'name'
+                                            }
+                                        }) }}
+                                        <div class="field-error-message" id="prenom-error"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        {{ form_label(registrationForm.nom) }}
+                                        {{ form_widget(registrationForm.nom, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'autocomplete': 'off',
+                                                'data-validate': 'name'
+                                            }
+                                        }) }}
+                                        <div class="field-error-message" id="nom-error"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        {{ form_label(registrationForm.genre) }}
+                                        {{ form_widget(registrationForm.genre, {
+                                            'attr': {
+                                                'class': 'form-control'
+                                            }
+                                        }) }}
+                                        <div class="field-error-message" id="genre-error"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        {{ form_label(registrationForm.numeroTelephone) }}
+                                        {{ form_widget(registrationForm.numeroTelephone, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'autocomplete': 'off',
+                                                'data-validate': 'phone'
+                                            }
+                                        }) }}
+                                        <div class="field-error-message" id="phone-error"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        {{ form_label(registrationForm.adresse) }}
+                                        {{ form_widget(registrationForm.adresse, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'autocomplete': 'off'
+                                            }
+                                        }) }}
+                                        <div class="field-error-message" id="adresse-error"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        {{ form_label(registrationForm.nomOrganisation) }}
+                                        {{ form_widget(registrationForm.nomOrganisation, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'autocomplete': 'off'
+                                            }
+                                        }) }}
+                                        <div class="field-error-message" id="org-error"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        {{ form_label(registrationForm.role) }}
+                                        {{ form_widget(registrationForm.role, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'autocomplete': 'off'
+                                            }
+                                        }) }}
+                                        <div class="field-error-message" id="role-error"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="recaptcha_token" id="recaptcha_token">
+
+                            <div class="form-group mb-3 mt-3">
+                                <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}" data-callback="onRecaptchaSuccess"></div>
+                                <div class="field-error-message" id="recaptcha-error"></div>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-3">
+                                <button type="submit" class="btn btn-lg btn-primary" id="submitButton" disabled>Register</button>
+                            </div>
+                        {{ form_end(registrationForm) }}
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">Already have an account? <a href="{{ path('app_login') }}">Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Validation popup elements -->
+<div id="validationPopupBackdrop" class="validation-popup-backdrop"></div>
+<div id="validationPopup" class="validation-popup">
+    <span class="validation-popup-close" id="validationPopupClose">&times;</span>
+    <h4>Please fix the following errors:</h4>
+    <ul id="validationErrors"></ul>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+function onRecaptchaSuccess(token) {
+    document.getElementById('recaptcha_token').value = token;
+    document.getElementById('submitButton').disabled = false;
+    hideError('recaptcha');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registrationForm');
+    const popup = document.getElementById('validationPopup');
+    const backdrop = document.getElementById('validationPopupBackdrop');
+    const closeBtn = document.getElementById('validationPopupClose');
+    const errorsList = document.getElementById('validationErrors');
+    
+    // Define validation rules
+    const validationRules = {
+        email: {
+            pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            message: 'Please enter a valid email address'
+        },
+        password: {
+            // Updated pattern to require both letters and numbers
+            pattern: /^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$/,
+            minLength: 8,
+            message: 'Password must be at least 8 characters and contain both letters and numbers'
+        },
+        name: {
+            pattern: /^[a-zA-Z\s\-]{2,50}$/,
+            message: 'Name can only contain letters, spaces and hyphens (2-50 characters)'
+        },
+        phone: {
+            pattern: /^[0-9]{8}$/,
+            message: 'Please enter a valid 8-digit phone number'
+        }
+    };
+    
+    // Function to show validation popup
+    function showValidationPopup(errors) {
+        errorsList.innerHTML = '';
+        errors.forEach(error => {
+            const li = document.createElement('li');
+            li.textContent = error;
+            errorsList.appendChild(li);
+        });
+        
+        backdrop.style.display = 'block';
+        popup.style.display = 'block';
+    }
+    
+    // Function to hide validation popup
+    function hideValidationPopup() {
+        backdrop.style.display = 'none';
+        popup.style.display = 'none';
+    }
+    
+    // Functions to show and hide field-specific errors
+    function showError(fieldId, message) {
+        // Find the field
+        const field = document.getElementById('registration_form_' + fieldId);
+        if (!field) return;
+        
+        // Get the parent form-group
+        const formGroup = field.closest('.form-group');
+        if (!formGroup) return;
+        
+        // Set error message
+        const errorElement = document.getElementById(fieldId + '-error');
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+        
+        // Add invalid class to input
+        field.classList.add('is-invalid');
+    }
+    
+    function hideError(fieldId) {
+        // Find the field
+        const field = document.getElementById('registration_form_' + fieldId);
+        if (!field) return;
+        
+        // Get the parent form-group
+        const formGroup = field.closest('.form-group');
+        if (!formGroup) return;
+        
+        // Hide error message
+        const errorElement = document.getElementById(fieldId + '-error');
+        if (errorElement) {
+            errorElement.style.display = 'none';
+        }
+        
+        // Remove invalid class
+        field.classList.remove('is-invalid');
+    }
+    
+    // Validate field and show/hide error
+    function validateField(field) {
+        // Skip hidden fields
+        if (field.type === 'hidden') return true;
+        
+        let isValid = true;
+        let errorMessage = '';
+        let fieldId = '';
+        
+        // Extract the field ID from the full ID
+        if (field.id.startsWith('registration_form_')) {
+            fieldId = field.id.replace('registration_form_', '');
+        }
+        
+        if (!fieldId) return true;
+        
+        // Validate based on field type
+        if (fieldId === 'email') {
+            if (!field.value.trim()) {
+                isValid = false;
+                errorMessage = 'Email is required';
+            } else if (!validationRules.email.pattern.test(field.value)) {
+                isValid = false;
+                errorMessage = validationRules.email.message;
+            }
+        } 
+        else if (fieldId === 'password') {
+            if (!field.value.trim()) {
+                isValid = false;
+                errorMessage = 'Password is required';
+            } else if (field.value.length < validationRules.password.minLength) {
+                isValid = false;
+                errorMessage = 'Password must be at least 8 characters';
+            } else if (!validationRules.password.pattern.test(field.value)) {
+                isValid = false;
+                errorMessage = validationRules.password.message;
+            }
+        }
+        else if (fieldId === 'prenom' || fieldId === 'nom') {
+            if (!field.value.trim()) {
+                isValid = false;
+                errorMessage = (fieldId === 'prenom' ? 'First name' : 'Last name') + ' is required';
+            } else if (!validationRules.name.pattern.test(field.value)) {
+                isValid = false;
+                errorMessage = (fieldId === 'prenom' ? 'First name' : 'Last name') + ' ' + validationRules.name.message;
+            }
+        }
+        else if (fieldId === 'numeroTelephone') {
+            if (!field.value.trim()) {
+                isValid = false;
+                errorMessage = 'Phone number is required';
+            } else if (!validationRules.phone.pattern.test(field.value)) {
+                isValid = false;
+                errorMessage = validationRules.phone.message;
+            }
+            fieldId = 'phone'; // Use simplified ID for the error element
+        }
+        else if (fieldId === 'adresse') {
+            if (!field.value.trim()) {
+                isValid = false;
+                errorMessage = 'Address is required';
+            }
+        }
+        else if (fieldId === 'genre') {
+            if (!field.value) {
+                isValid = false;
+                errorMessage = 'Gender selection is required';
+            }
+        }
+        else if (fieldId === 'role') {
+            if (!field.value) {
+                isValid = false;
+                errorMessage = 'Role selection is required';
+            }
+        }
+        else if (fieldId === 'nomOrganisation') {
+            fieldId = 'org'; // Use simplified ID for the error element
+        }
+        
+        // Show or hide error based on validation result
+        if (!isValid) {
+            showError(fieldId, errorMessage);
+        } else {
+            hideError(fieldId);
+        }
+        
+        return isValid;
+    }
+    
+    // Add event listeners to all form fields
+    const fields = form.querySelectorAll('input, select');
+    fields.forEach(field => {
+        if (field.type !== 'hidden') {
+            // Validate on blur (when field loses focus)
+            field.addEventListener('blur', function() {
+                validateField(this);
+            });
+            
+            // Clear errors when typing/changing
+            field.addEventListener('input', function() {
+                // Extract the field ID
+                let fieldId = '';
+                if (this.id.startsWith('registration_form_')) {
+                    fieldId = this.id.replace('registration_form_', '');
+                }
+                
+                // Special case for field naming
+                if (fieldId === 'numeroTelephone') fieldId = 'phone';
+                if (fieldId === 'nomOrganisation') fieldId = 'org';
+                
+                // Check if the field is now valid
+                if (validateField(this)) {
+                    hideError(fieldId);
+                }
+            });
+        }
+    });
+    
+    // Close validation popup when clicking close button
+    closeBtn.addEventListener('click', hideValidationPopup);
+    
+    // Close validation popup when clicking outside
+    backdrop.addEventListener('click', hideValidationPopup);
+    
+    // Form submission handler
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const errors = [];
+        let hasErrors = false;
+        
+        // Validate all fields
+        fields.forEach(field => {
+            if (field.type !== 'hidden' && field.id !== 'recaptcha_token') {
+                if (!validateField(field)) {
+                    hasErrors = true;
+                    
+                    // Extract field name for error message
+                    let fieldName = '';
+                    if (field.id.includes('email')) fieldName = 'Email';
+                    else if (field.id.includes('password')) fieldName = 'Password';
+                    else if (field.id.includes('prenom')) fieldName = 'First name';
+                    else if (field.id.includes('nom')) fieldName = 'Last name';
+                    else if (field.id.includes('genre')) fieldName = 'Gender';
+                    else if (field.id.includes('numeroTelephone')) fieldName = 'Phone number';
+                    else if (field.id.includes('adresse')) fieldName = 'Address';
+                    else if (field.id.includes('nomOrganisation')) fieldName = 'Organization';
+                    else if (field.id.includes('role')) fieldName = 'Role';
+                    
+                    errors.push(fieldName + ' is invalid');
+                }
+            }
+        });
+        
+        // Validate recaptcha
+        if (!document.getElementById('recaptcha_token').value) {
+            hasErrors = true;
+            errors.push('Please complete the reCAPTCHA verification');
+            showError('recaptcha', 'Please complete the reCAPTCHA verification');
+        }
+        
+        if (hasErrors) {
+            showValidationPopup(errors);
+        } else {
+            form.submit(); // Submit the form if no errors
+        }
+    });
+});
+</script>
+{% endblock %} 

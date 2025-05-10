@@ -1,0 +1,170 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Event index{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <div class="position-sticky pt-3">
+                <!-- Logo and User Info -->
+                <div class="text-center mb-4">
+                    <div class="logo mb-3">
+                        <span class="logo-racket">🎾</span>
+                        <span class="logo-text">RackeTech</span>
+                    </div>
+                    <!-- Custom Dropdown Implementation -->
+                    <div class="user-dropdown">
+                        <div onclick="toggleUserDropdown()" class="btn btn-sm btn-light" id="userDropdownBtn">
+                            <i class="fas fa-user-circle me-1"></i> {{ app.user.prenom }} <i
+                                class="fas fa-caret-down"></i>
+                        </div>
+                        <div id="userDropdownContent" class="user-dropdown-content">
+                            <a href="{{ path('app_profile') }}">Profile</a>
+                            <div class="user-dropdown-divider"></div>
+                            <a href="{{ path('app_logout') }}">Logout</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_user_management') }}">
+                            <i class="fas fa-users"></i> User Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_emprunt_index') }}">
+                            <i class="fas fa-handshake"></i> Emprunt Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_materiel_index') }}">
+                            <i class="fas fa-toolbox"></i> Materiels Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_tournoi_index') }}">
+                            <i class="fas fa-trophy"></i> Tournoi Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_reservation_index') }}">
+                            <i class="fas fa-calendar-check"></i> Reservation Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link  " href="{{ path('app_maintenance_index') }}">
+                            <i class="fas fa-users"></i> Maintenance Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ path('app_event_index') }}" class="nav-link active">
+                            <i class="fas fa-calendar"></i>
+                            Events
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ path('app_terrain_index') }}" class="nav-link">
+                            <i class="fas fa-map"></i>
+                            Terrains
+                        </a>
+                    </li>
+                    {# <li class="nav-item">
+                        <a href="{{ path('app_mapb') }}" class="nav-link">
+                            <i class="fas fa-map"></i>
+                            Carte des terrains
+                        </a>
+                    </li> #}
+                    <li class="nav-item">
+                        <a href="{{ path('calb') }}" class="nav-link">
+                            <i class="fas fa-calendar"></i>
+                            Calendar Events
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-bar"></i> Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-bell"></i> Notifications
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+            <div
+                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Event </h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <button type="button" class="btn btn-danger"><i class="fas fa-file-pdf"></i><a
+                                href="{{ path('event_pdf') }}" class="btn btn-danger">Export pdf</a></button>
+                    </div>
+                    <div class="btn-group me-2">
+                        <a href="{{ path('app_event_new') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Nouvel Event
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Details</th>
+                        <th>Name</th>
+                        <th>StartDate</th>
+                        <th>EndDate</th>
+                        <th>Reward</th>
+                        <th>actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ event.id }}</td>
+                        <td>{{ event.details }}</td>
+                        <td>{{ event.name }}</td>
+                        <td>{{ event.startDate ? event.startDate|date('Y-m-d H:i:s') : '' }}</td>
+                        <td>{{ event.endDate ? event.endDate|date('Y-m-d H:i:s') : '' }}</td>
+                        <td>{{ event.reward }}</td>
+                        <td>
+                            <a href="{{ path('app_event_show', {'id': event.id}) }}">show</a>
+                            <a href="{{ path('app_event_edit', {'id': event.id}) }}">edit</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7">no records found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+        </main>
+    </div>
+</div>
+{% endblock %}

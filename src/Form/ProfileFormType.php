@@ -1,0 +1,86 @@
+<?php
+
+namespace App\Form;
+
+use App\Entity\User;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+class ProfileFormType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('email', EmailType::class, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Email'
+            ])
+            ->add('plainPassword', PasswordType::class, [
+                'mapped' => false,
+                'required' => false,
+                'attr' => ['class' => 'form-control'],
+                'label' => 'New Password',
+                'constraints' => [
+                    new Length([
+                        'min' => 6,
+                        'minMessage' => 'Your password should be at least {{ limit }} characters',
+                        'max' => 4096,
+                    ]),
+                ],
+            ])
+            ->add('prenom', TextType::class, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'First Name'
+            ])
+            ->add('nom', TextType::class, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Last Name'
+            ])
+            ->add('genre', ChoiceType::class, [
+                'choices' => [
+                    'Male' => 'Male',
+                    'Female' => 'Female',
+                    'Other' => 'Other'
+                ],
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Gender',
+                'required' => false
+            ])
+            ->add('numeroTelephone', TextType::class, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Phone Number',
+                'required' => false
+            ])
+            ->add('adresse', TextType::class, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Address',
+                'required' => false
+            ])
+            ->add('nomOrganisation', TextType::class, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Organization Name',
+                'required' => false
+            ])
+            ->add('photoProfil', FileType::class, [
+                'mapped' => false,
+                'required' => false,
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Profile Picture'
+            ]);
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => User::class,
+        ]);
+    }
+} 

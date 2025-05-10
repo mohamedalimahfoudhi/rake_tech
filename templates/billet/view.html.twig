@@ -1,0 +1,227 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du Billet - RackeTech{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .ticket-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .ticket {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+    .ticket-header {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+    .ticket-body {
+        padding: 20px;
+    }
+    .ticket-footer {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-top: 1px solid #ddd;
+        text-align: center;
+    }
+    .qr-container {
+        text-align: center;
+        margin: 20px 0;
+    }
+    .qr-code {
+        max-width: 100%;
+        height: auto;
+    }
+    .currency-converter {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        {% include 'partials/_admin_sidebar.html.twig' %}
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Détails du Billet #{{ billet.id }}</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{{ path('app_ticket_index') }}" class="btn btn-sm btn-secondary me-2">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+                    <a href="{{ path('app_ticket_edit', {'id': billet.id}) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                </div>
+            </div>
+
+            <div class="ticket-container">
+                <!-- Ticket Card -->
+                <div class="ticket">
+                    <div class="ticket-header">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h3>{{ billet.eventId ? billet.eventId.name : 'N/A' }}</h3>
+                                <p class="text-muted">
+                                    {% if billet.eventId %}
+                                        {{ billet.eventId.startDate|date('d/m/Y H:i') }} - {{ billet.eventId.endDate|date('d/m/Y H:i') }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <h4>{{ billet.typeBillet }}</h4>
+                                <span class="badge 
+                                    {% if billet.statut == 'Valide' %}bg-success
+                                    {% elseif billet.statut == 'Non valide' %}bg-warning
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ billet.statut }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ticket-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Informations du billet</h5>
+                                <table class="table">
+                                    <tr>
+                                        <th>ID</th>
+                                        <td>{{ billet.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Type</th>
+                                        <td>{{ billet.typeBillet }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Prix</th>
+                                        <td>{{ billet.prix }} €</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Quantité</th>
+                                        <td>{{ billet.quantite }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Montant total</th>
+                                        <td>{{ billet.prix * billet.quantite }} €</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date d'achat</th>
+                                        <td>{{ billet.dateAchat ? billet.dateAchat|date('d/m/Y H:i') : 'N/A' }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="qr-container">
+                                    <h5>Code QR de vérification</h5>
+                                    <img src="{{ qrCode }}" alt="QR Code" class="qr-code">
+                                    <p class="text-muted mt-2">Scannez ce code pour vérifier la validité du billet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ticket-footer">
+                        <small class="text-muted">Billet généré le {{ "now"|date('d/m/Y H:i') }}</small>
+                    </div>
+                </div>
+
+                <!-- Currency Converter -->
+                <div class="currency-converter">
+                    <h4>Convertisseur de devises</h4>
+                    <p>Prix du billet en différentes devises (taux au {{ "now"|date('d/m/Y') }})</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Devise</th>
+                                    <th>Taux</th>
+                                    <th>Montant unitaire</th>
+                                    <th>Montant total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for currency, rate in exchangeRates %}
+                                    <tr>
+                                        <td>{{ currency }}</td>
+                                        <td>{{ rate }}</td>
+                                        <td>{{ (billet.prix * rate)|number_format(2) }} {{ currency }}</td>
+                                        <td>{{ (billet.prix * billet.quantite * rate)|number_format(2) }} {{ currency }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Calculateur personnalisé</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">Devise</span>
+                                    <select id="currency-select" class="form-select">
+                                        {% for currency, rate in exchangeRates %}
+                                            <option value="{{ rate }}">{{ currency }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">Quantité</span>
+                                    <input type="number" id="quantity-input" class="form-control" value="{{ billet.quantite }}" min="1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info" id="calculation-result">
+                            <strong>Montant total:</strong> <span id="total-amount">{{ billet.prix * billet.quantite }} EUR</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currencySelect = document.getElementById('currency-select');
+        const quantityInput = document.getElementById('quantity-input');
+        const totalAmount = document.getElementById('total-amount');
+        const basePrice = {{ billet.prix }};
+        
+        function updateCalculation() {
+            const rate = parseFloat(currencySelect.value);
+            const quantity = parseInt(quantityInput.value);
+            const total = basePrice * quantity * rate;
+            
+            // Get the selected currency code
+            const currencyCode = currencySelect.options[currencySelect.selectedIndex].text;
+            
+            totalAmount.textContent = total.toFixed(2) + ' ' + currencyCode;
+        }
+        
+        currencySelect.addEventListener('change', updateCalculation);
+        quantityInput.addEventListener('input', updateCalculation);
+        
+        // Initialize calculation
+        updateCalculation();
+    });
+</script>
+{% endblock %} 

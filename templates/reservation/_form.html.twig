@@ -1,0 +1,120 @@
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reservation.css') }}">
+{% endblock %}
+
+{{ form_start(form) }}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form_label(form.type, 'Type de réservation*') }}
+                {{ form_widget(form.type, {'attr': {'class': 'form-select form-control'}}) }}
+                {{ form_errors(form.type) }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form_label(form.datereservation, 'Date de réservation') }}
+                {{ form_widget(form.datereservation, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.datereservation) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form_label(form.statut, 'Statut de la réservation*') }}
+                {{ form_widget(form.statut, {'attr': {'class': 'form-select form-control'}}) }}
+                {{ form_errors(form.statut) }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form_label(form.utilisateurid, 'Utilisateur*') }}
+                {{ form_widget(form.utilisateurid, {'attr': {'class': 'form-select form-control'}}) }}
+                {{ form_errors(form.utilisateurid) }}
+            </div>
+        </div>
+
+        {% if form.materiel is defined %}
+        <div class="row materiel-section" id="materiel-section">
+            <div class="col-12 mb-3">
+                <h4>Détails du Matériel</h4>
+            </div>
+            <div class="col-md-12 mb-3">
+                {{ form_label(form.materiel) }}
+                {{ form_widget(form.materiel, {'attr': {'class': 'form-select'}}) }}
+                {{ form_errors(form.materiel) }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if form.terrain is defined %}
+        <div class="row terrain-section" id="terrain-section">
+            <div class="col-12 mb-3">
+                <h4>Détails du Terrain</h4>
+            </div>
+            <div class="col-md-12 mb-3">
+                {{ form_label(form.terrain) }}
+                {{ form_widget(form.terrain, {'attr': {'class': 'form-select'}}) }}
+                {{ form_errors(form.terrain) }}
+            </div>
+        </div>
+        {% endif %}
+
+        <div id="billet-section" style="display: none;">
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="mb-3">Sélection des billets</h5>
+                    <div class="billet-selection">
+                        {{ form_widget(form.billetid) }}
+                        {{ form_errors(form.billetid) }}
+                    </div>
+                    <small class="form-text text-muted">Sélectionnez un ou plusieurs billets pour cette réservation</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="d-flex justify-content-between">
+            <a href="{{ path('app_reservation_index') }}" class="btn btn-secondary">
+                <i class="ri-arrow-go-back-line"></i> Retour
+            </a>
+            {{ form_widget(form.submit, {
+                'label': 'Enregistrer',
+                'attr': {
+                    'class': 'btn btn-primary'
+                }
+            }) }}
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.querySelector('#{{ form.type.vars.id }}');
+    const materielSection = document.querySelector('#materiel-section');
+    const terrainSection = document.querySelector('#terrain-section');
+    const billetSection = document.querySelector('#billet-section');
+
+    function toggleSections() {
+        if (materielSection) {
+            materielSection.style.display = typeSelect.value === 'Matériel' ? 'flex' : 'none';
+        }
+        if (terrainSection) {
+            terrainSection.style.display = typeSelect.value === 'Terrain' ? 'flex' : 'none';
+        }
+    }
+
+    function toggleBilletSection() {
+        if (billetSection) {
+            billetSection.style.display = typeSelect.value === 'BILLET' ? 'block' : 'none';
+        }
+    }
+
+    if (typeSelect) {
+        toggleSections();
+        typeSelect.addEventListener('change', toggleSections);
+        toggleBilletSection();
+        typeSelect.addEventListener('change', toggleBilletSection);
+    }
+});
+</script>
+{% endblock %} 

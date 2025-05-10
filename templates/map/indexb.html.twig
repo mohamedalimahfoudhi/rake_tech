@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Event{% endblock %}
+
+{% block body %}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Map</title>
+    <link rel="stylesheet" href="{{ asset('build/app.css') }}">
+    <script src="{{ asset('build/app.js') }}" defer></script>
+</head>
+	<link href="https://fonts.googleapis.com/css?family=Work+Sans:300,400,500,700,800" rel="stylesheet">
+
+<body>
+    <div id="map" style="width:600 height: 400px;"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const map = L.map('map').setView([36.8, 10.1], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+            // Ajouter les marqueurs pour chaque terrain
+            const terrains = {{ terrains | json_encode | raw }};
+            terrains.forEach(function (terrain) {
+                L.marker([terrain.latitude, terrain.longitude])
+                    .addTo(map)
+                    .bindPopup(terrain.name)
+                    .openPopup();
+            });
+        });
+    </script>
+</body>
+</html>
+
+  {{ encore_entry_script_tags('app') }}
+  {{ encore_entry_link_tags('app') }}
+{% endblock %}

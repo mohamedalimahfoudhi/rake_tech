@@ -1,0 +1,66 @@
+{# templates/materiel/mes_materiels.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Matériels Loués{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Mes Matériels Loués</h1>
+
+        {% if app.session.flashbag.get('success') %}
+            <div class="alert alert-success">
+                {% for message in app.session.flashbag.get('success') %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if app.session.flashbag.get('error') %}
+            <div class="alert alert-danger">
+                {% for message in app.session.flashbag.get('error') %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="row">
+            {% if emprunts is empty %}
+                <p>Aucun matériel n'a été loué.</p>
+            {% else %}
+                {% for emprunt in emprunts %}
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ emprunt.materielid.type }} - {{ emprunt.materielid.typesport }}</h5>
+                                <p class="card-text">Prix: {{ emprunt.materielid.prix }} EUR</p>
+                                <p class="card-text"><strong>Propriétaire:</strong> {{ emprunt.materielid.ownertype }}</p>
+                                <p class="card-text"><strong>Date d'emprunt:</strong> {{ emprunt.dateemprunt|date('d/m/Y') }}</p>
+                                <p class="card-text"><strong>Date de retour:</strong> {{ emprunt.dateretour|date('d/m/Y') }}</p>
+
+                                {% if emprunt.statutemprunt == 'NULL' %}
+                                    <p class="badge bg-warning">En attente de confirmation</p>
+                                {% elseif emprunt.statutemprunt == 'Emprunté' %}
+                                    <p class="badge bg-success">Emprunté</p>
+                                {% elseif emprunt.statutemprunt == 'Retourné' %}
+                                    <p class="badge bg-info">Retourné</p>
+                                {% elseif emprunt.statutemprunt == 'En retard' %}
+                                    <p class="badge bg-danger">En retard</p>
+                                {% endif %}
+
+                                <!-- Show the 'Signaler en panne' button only if 'signaler' is null -->
+                                {% if emprunt.materielid.signaler is null %}
+                                    <form action="{{ path('signaler_panne', {'materielId': emprunt.materielid.id}) }}" method="post">
+                                        <button type="submit" class="btn btn-danger">Signaler en panne</button>
+                                    </form>
+                                {% else %}
+                                    <p class="text-muted">Matériel déjà signalé comme étant en panne.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

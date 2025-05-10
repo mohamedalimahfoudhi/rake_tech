@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des événements Tennis</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 13px;
+            background: #f9f9f9;
+            margin: 20px 30px;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            color: #2e7d32;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        .logo {
+            width: 80px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .header-bar {
+            background-color: #ff9800;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background-color: #388e3c;
+            color: white;
+            padding: 12px 8px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f1f8e9;
+        }
+
+        .badge-reward {
+            background-color: #ff9800;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-style: italic;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+<img src="https://i.etsystatic.com/27595895/r/il/7b1199/4818863901/il_1588xN.4818863901_h1v9.jpg"
+     alt="Tennis Club"
+     style="width: 100px; border-radius: 8px; margin-bottom: 10px;" />
+        <h1>Événements de Tennis</h1>
+    </div>
+
+    <div class="header-bar">
+        Planning Officiel des Événements
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Détails</th>
+                <th>Nom</th>
+                <th>Début</th>
+                <th>Fin</th>
+                <th>Récompense</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for event in events %}
+            <tr>
+                <td>{{ event.id }}</td>
+                <td>{{ event.details }}</td>
+                <td>{{ event.name }}</td>
+                <td>{{ event.startDate ? event.startDate|date('d/m/Y H:i') : '' }}</td>
+                <td>{{ event.endDate ? event.endDate|date('d/m/Y H:i') : '' }}</td>
+                <td><span class="badge-reward">{{ event.reward }}</span></td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">Aucun événement trouvé.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        © {{ "now"|date("Y") }} Club de Tennis | Passion, Excellence & Fair-Play 
+    </div>
+
+</body>
+</html>

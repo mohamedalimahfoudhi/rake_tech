@@ -1,0 +1,85 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+    
+
+    <div>
+        {{ form_label(form.name) }}
+        {{ form_widget(form.name) }}
+        {% if form.name.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.name.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    
+
+    <div>
+        {{ form_label(form.location) }}
+        {{ form_widget(form.location) }}
+        {% if form.location.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.location.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <div>
+        {{ form_label(form.courtType) }}
+        {{ form_widget(form.courtType) }}
+        {% if form.courtType.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.courtType.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <div>
+        {{ form_label(form.status) }}
+        {{ form_widget(form.status) }}
+        {% if form.status.vars.errors|length > 0 %}
+            <ul class="error-list">
+                {% for error in form.status.vars.errors %}
+                    <li class="error">{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+   {{ form_label(form.latitude) }}
+        {{ form_widget(form.latitude) }}
+        {{ form_label(form.longitude) }}
+        {{ form_widget(form.longitude) }}
+          <div id="map" style="height: 400px; margin-top: 20px;"></div>
+
+    <button class="btn">{{ button_label|default('Save') }}</button>
+
+{{ form_end(form) }}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+<script>
+    const map = L.map('map').setView([36.8, 10.18], 10); // Centrer sur Tunis
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    let marker;
+
+    map.on('click', function(e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+
+        document.getElementById("{{ form.latitude.vars.id }}").value = lat;
+        document.getElementById("{{ form.longitude.vars.id }}").value = lng;
+    });
+</script>

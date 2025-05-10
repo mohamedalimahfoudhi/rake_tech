@@ -1,0 +1,11 @@
+services:
+    app.twilio_sms.service:
+        class: App\Bundle\TwilioSmsBundle\Services\TwilioSmsService
+        arguments:
+            - '%twilio_sms.account_sid%'
+            - '%twilio_sms.auth_token%'
+            - '%twilio_sms.phone_number%'
+            - '@logger'
+        public: true
+        tags:
+            - { name: 'monolog.logger', channel: 'twilio' } 

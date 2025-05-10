@@ -1,0 +1,360 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques des Emprunts, Maintenances et Matériels{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .stats-dashboard {
+        margin-top: 20px;
+    }
+    .stats-card {
+        margin-bottom: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 20px;
+        background-color: #fff;
+    }
+    .stats-card h3 {
+        margin-top: 0;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        color: #2c3e50;
+    }
+    .stats-metrics {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    .metric-box {
+        flex: 0 0 48%;
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid #3498db;
+    }
+    .metric-box.primary { border-color: #3498db; }
+    .metric-box.success { border-color: #2ecc71; }
+    .metric-box.warning { border-color: #f39c12; }
+    .metric-box.danger { border-color: #e74c3c; }
+    
+    .metric-value {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .metric-label {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+    .chart-container {
+        height: 350px;
+        margin-top: 20px;
+    }
+    .chart-container h4 {
+        margin-bottom: 15px;
+        color: #34495e;
+    }
+    .top-list {
+        margin-top: 20px;
+    }
+    .top-list-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+    .top-list-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        {% include 'partials/_admin_sidebar.html.twig' %}
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Tableau de Bord Statistique</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print();">
+                            <i class="fas fa-print"></i> Imprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-dashboard">
+                <!-- Matériels Statistics -->
+                <div class="stats-card">
+                    <h3><i class="fas fa-toolbox me-2"></i>Statistiques des Matériels</h3>
+                    
+                    <div class="stats-metrics">
+                        <div class="metric-box primary">
+                            <div class="metric-value">{{ totalMateriels }}</div>
+                            <div class="metric-label">Total des matériels</div>
+                        </div>
+                        <div class="metric-box success">
+                            <div class="metric-value">{{ availabilityRate }}%</div>
+                            <div class="metric-label">Taux de disponibilité</div>
+                        </div>
+                        <div class="metric-box warning">
+                            <div class="metric-value">{{ materielsAvailability['En emprunt'] }}</div>
+                            <div class="metric-label">Matériels en emprunt</div>
+                        </div>
+                        <div class="metric-box danger">
+                            <div class="metric-value">{{ materielsAvailability['En maintenance'] }}</div>
+                            <div class="metric-label">Matériels en maintenance</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h4>Répartition par statut</h4>
+                                <div id="materiel_status_chart"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h4>Répartition par catégorie</h4>
+                                <div id="materiel_category_chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Emprunts Statistics -->
+                <div class="stats-card">
+                    <h3><i class="fas fa-handshake me-2"></i>Statistiques des Emprunts</h3>
+                    
+                    <div class="stats-metrics">
+                        <div class="metric-box primary">
+                            <div class="metric-value">{{ totalEmprunts }}</div>
+                            <div class="metric-label">Total des emprunts</div>
+                        </div>
+                        <div class="metric-box success">
+                            <div class="metric-value">{{ avgEmpruntDuration }} jours</div>
+                            <div class="metric-label">Durée moyenne d'emprunt</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="chart-container">
+                                <h4>Évolution des emprunts dans le temps</h4>
+                                <div id="emprunt_time_chart"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Top 5 des utilisateurs</h4>
+                            <div class="top-list">
+                                {% for userId, userData in topUsers %}
+                                    <div class="top-list-item">
+                                        <span>{{ userData.name }}</span>
+                                        <span><strong>{{ userData.count }}</strong> emprunts</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <h4 class="mt-4">Top 5 des matériels empruntés</h4>
+                            <div class="top-list">
+                                {% for materielId, materielData in topMaterials %}
+                                    <div class="top-list-item">
+                                        <span>{{ materielData.name }}</span>
+                                        <span><strong>{{ materielData.count }}</strong> emprunts</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+    </div>
+
+                <!-- Maintenances Statistics -->
+                <div class="stats-card">
+                    <h3><i class="fas fa-wrench me-2"></i>Statistiques des Maintenances</h3>
+                    
+                    <div class="stats-metrics">
+                        <div class="metric-box primary">
+                            <div class="metric-value">{{ totalMaintenances }}</div>
+                            <div class="metric-label">Total des maintenances</div>
+                        </div>
+                        <div class="metric-box success">
+                            <div class="metric-value">{{ avgMaintenanceDuration }} jours</div>
+                            <div class="metric-label">Durée moyenne</div>
+                        </div>
+                        <div class="metric-box warning">
+                            <div class="metric-value">{{ avgMaintenanceCost }} €</div>
+                            <div class="metric-label">Coût moyen</div>
+                        </div>
+    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="chart-container">
+                                <h4>Évolution des maintenances dans le temps</h4>
+                                <div id="maintenance_time_chart"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="chart-container">
+                                <h4>Types de maintenance</h4>
+                                <div id="maintenance_type_chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    </div>
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Données pour les graphiques
+        const empruntData = {{ empruntData|json_encode()|raw }};
+        const maintenanceData = {{ maintenanceData|json_encode()|raw }};
+        const materielsData = {{ materielsData|json_encode()|raw }};
+        const materielsByCategory = {{ materielsByCategory|json_encode()|raw }};
+        const maintenanceByType = {{ maintenanceByType|json_encode()|raw }};
+        
+        // Graphique statut des matériels
+        new Chart(document.getElementById('materiel_status_chart'), {
+            type: 'pie',
+            data: {
+                labels: Object.keys(materielsData),
+                datasets: [{
+                    data: Object.values(materielsData),
+                    backgroundColor: [
+                        '#2ecc71', // Disponible
+                        '#3498db', // En emprunt
+                        '#e74c3c', // En maintenance
+                        '#95a5a6'  // Autres
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+        
+        // Graphique catégories des matériels
+        new Chart(document.getElementById('materiel_category_chart'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(materielsByCategory),
+                datasets: [{
+                    data: Object.values(materielsByCategory),
+                    backgroundColor: [
+                        '#3498db',
+                        '#2ecc71',
+                        '#e74c3c',
+                        '#f39c12',
+                        '#9b59b6',
+                        '#1abc9c'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+        
+        // Graphique évolution des emprunts
+        const empruntDates = Object.keys(empruntData).sort();
+        const empruntCounts = empruntDates.map(date => empruntData[date]);
+        
+        new Chart(document.getElementById('emprunt_time_chart'), {
+            type: 'line',
+            data: {
+                labels: empruntDates,
+                datasets: [{
+                    label: 'Nombre d\'emprunts',
+                    data: empruntCounts,
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Graphique évolution des maintenances
+        const maintenanceDates = Object.keys(maintenanceData).sort();
+        const maintenanceCounts = maintenanceDates.map(date => maintenanceData[date]);
+        
+        new Chart(document.getElementById('maintenance_time_chart'), {
+            type: 'line',
+            data: {
+                labels: maintenanceDates,
+                datasets: [{
+                    label: 'Nombre de maintenances',
+                    data: maintenanceCounts,
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Graphique types de maintenance
+        new Chart(document.getElementById('maintenance_type_chart'), {
+            type: 'pie',
+            data: {
+                labels: Object.keys(maintenanceByType),
+                datasets: [{
+                    data: Object.values(maintenanceByType),
+                    backgroundColor: [
+                        '#3498db',
+                        '#2ecc71',
+                        '#e74c3c',
+                        '#f39c12'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

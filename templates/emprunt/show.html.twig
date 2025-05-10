@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l'Emprunt{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Détails de l'Emprunt</h1>
+            <div class="btn-group">
+                <a href="{{ path('app_emprunt_index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                </a>
+                <a href="{{ path('app_emprunt_edit', {'id': emprunt.empruntid}) }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+            </div>
+        </div>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title mb-4">Informations de l'emprunt</h5>
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>Date d'emprunt</th>
+                                    <td>{{ emprunt.dateEmprunt|date('d/m/Y') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Date de retour</th>
+                                    <td>{{ emprunt.dateRetour|date('d/m/Y') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Statut</th>
+                                    <td>
+                                        {% if emprunt.statutEmprunt == 'Emprunté' %}
+                                            <span class="badge bg-primary">{{ emprunt.statutEmprunt }}</span>
+                                        {% elseif emprunt.statutEmprunt == 'Retourné' %}
+                                            <span class="badge bg-success">{{ emprunt.statutEmprunt }}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{ emprunt.statutEmprunt }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a href="{{ path('app_emprunt_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+                    <div class="btn-group">
+                        <a href="{{ path('app_emprunt_edit', {'id': emprunt.empruntid}) }}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        {{ include('emprunt/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .badge {
+            font-size: 0.9em;
+            padding: 0.5em 1em;
+        }
+        .table th {
+            width: 200px;
+            background-color: #f8f9fa;
+        }
+    </style>
+{% endblock %} 

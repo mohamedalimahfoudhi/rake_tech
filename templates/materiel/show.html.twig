@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du Matériel{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Détails du Matériel</h1>
+            <div class="btn-group">
+                <a href="{{ path('app_materiel_index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                </a>
+                <a href="{{ path('app_materiel_edit', {'id': materiel.id}) }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+            </div>
+        </div>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title mb-4">Informations générales</h5>
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>Type</th>
+                                    <td>{{ materiel.type }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Sport</th>
+                                    <td>{{ materiel.typesport }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Prix</th>
+                                    <td>{{ materiel.prix|number_format(2, ',', ' ') }} €</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="card-title mb-4">État et disponibilité</h5>
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>Date de réservation</th>
+                                    <td>{{ materiel.datereservation ? materiel.datereservation|date('d/m/Y') : 'Non définie' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Statut</th>
+                                    <td>
+                                        {% if materiel.statut == 'disponible' %}
+                                            <span class="badge bg-success">Disponible</span>
+                                        {% elseif materiel.statut == 'reserve' %}
+                                            <span class="badge bg-warning">Réservé</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">En maintenance</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Type de propriétaire</th>
+                                    <td>
+                                        {% if materiel.ownertype == 'club' %}
+                                            <span class="badge bg-primary">Club</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Personnel</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a href="{{ path('app_materiel_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+                    <div class="btn-group">
+                        <a href="{{ path('app_materiel_edit', {'id': materiel.id}) }}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        {{ include('materiel/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .badge {
+            font-size: 0.9em;
+            padding: 0.5em 1em;
+        }
+        .table th {
+            width: 200px;
+            background-color: #f8f9fa;
+        }
+        .btn-group .btn {
+            margin: 0 2px;
+        }
+    </style>
+{% endblock %} 

@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la Réservation{% endblock %}
+
+{% block page_title %}Détails de la Réservation{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Détails de la réservation #{{ reservation.id }}</h5>
+                <div class="btn-group">
+                    <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-warning">
+                        <i class="ri-edit-line"></i> Modifier
+                    </a>
+                    <a href="{{ path('app_reservation_index') }}" class="btn btn-secondary">
+                        <i class="ri-arrow-go-back-line"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-striped">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-primary text-white" style="width: 200px;">Date</th>
+                                    <td class="bg-light">{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-primary text-white">Type</th>
+                                    <td class="bg-light">{{ reservation.type }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-primary text-white">Statut</th>
+                                    <td class="bg-light">
+                                        {% if reservation.statut == 'Confirmée' %}
+                                            <span class="badge badge-success">Confirmée</span>
+                                        {% elseif reservation.statut == 'En attente' %}
+                                            <span class="badge badge-warning">En attente</span>
+                                        {% elseif reservation.statut == 'Annulée' %}
+                                            <span class="badge badge-danger">Annulée</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">{{ reservation.statut }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-striped">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-primary text-white" style="width: 200px;">Utilisateur</th>
+                                    <td class="bg-light">
+                                        {% if reservation.utilisateurid %}
+                                            {{ reservation.utilisateurid }}
+                                        {% else %}
+                                            <span class="text-muted">Non défini</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if reservation.type == 'Matériel' and reservation.materiel is defined %}
+                                    <tr>
+                                        <th class="bg-primary text-white">Matériel</th>
+                                        <td class="bg-light">{{ reservation.materiel.type }} - {{ reservation.materiel.sport }}</td>
+                                    </tr>
+                                {% endif %}
+                                {% if reservation.type == 'Terrain' and reservation.terrain is defined %}
+                                    <tr>
+                                        <th class="bg-primary text-white">Terrain</th>
+                                        <td class="bg-light">{{ reservation.terrain.nom }} - {{ reservation.terrain.sport }}</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {% if reservation.type == 'Matériel' and reservation.materiel is defined %}
+                    <div class="mt-4">
+                        <h6 class="mb-3">Détails du Matériel</h6>
+                        <table class="table table-striped">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-primary text-white" style="width: 200px;">Type</th>
+                                    <td class="bg-light">{{ reservation.materiel.type }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-primary text-white">Sport</th>
+                                    <td class="bg-light">{{ reservation.materiel.sport }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-primary text-white">Prix</th>
+                                    <td class="bg-light">{{ reservation.materiel.prix }} €</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {% if reservation.type == 'Terrain' and reservation.terrain is defined %}
+                    <div class="mt-4">
+                        <h6 class="mb-3">Détails du Terrain</h6>
+                        <table class="table table-striped">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-primary text-white" style="width: 200px;">Nom</th>
+                                    <td class="bg-light">{{ reservation.terrain.nom }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-primary text-white">Sport</th>
+                                    <td class="bg-light">{{ reservation.terrain.sport }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-primary text-white">Surface</th>
+                                    <td class="bg-light">{{ reservation.terrain.surface }} m²</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %} 
